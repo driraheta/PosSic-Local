@@ -1,0 +1,184 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Usuarios.NuevoModel
+@{
+    ViewData["Title"] = "Usuarios";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a asp-page="./Index">Usuarios</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Agregar </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+        
+
+        });
+        function check() {
+            var checkbox1 = document.getElementById("check1");
+            if (checkbox1.checked == true) {
+                $("#Guardar1").attr("disabled", true);
+
+                $("#ClavePaso").attr("readonly", false);
+                $("#confirmacionPass").attr("readonly", false);
+
+            } else {
+                $("#Guardar1").attr("disabled", false);
+                $("#confirmacionPassSpan").text("");
+                $("#ClavePaso").attr("readonly", true);
+                $("#confirmacionPass").attr("readonly", true);
+                $("#ClavePaso").val("");
+                $("#confirmacionPass").val("");
+
+            }
+
+        }
+
+        function ValidacionPassword() {
+            console.log("Entro");
+            var checkbox1 = document.getElementById("check1");
+            if (checkbox1.checked == true) {
+            if ($("#ClavePaso").val() != $("#confirmacionPass").val()) {
+                $("#confirmacionPassSpan").text("Contraseñas Diferentes");
+                $("#Guardar1").attr("disabled", true);
+            } else {
+                if ($("#ClavePaso").val() != "") {
+                    $("#Guardar1").attr("disabled", false);
+                    $("#confirmacionPassSpan").text("");
+
+                } else {
+                    $("#confirmacionPassSpan").text("");
+                }
+                }
+            }
+        }
+    </script>
+}
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox ">
+        <div class="ibox-title">
+            <h2>Información Usuario</h2>
+
+        </div>
+        <div class="ibox-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                              <label asp-for="Usuario.Email" class="col-form-label">Email:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Usuario.Email" type="email" class="form-control">
+                            <span asp-validation-for="Usuario.Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Usuario.NomUsuario" class="col-form-label">Nombre:</label>
+                        </div>
+                        <div class="col-sm-8">
+
+
+                            <input asp-for="Usuario.NomUsuario" class="form-control" />
+                            <span asp-validation-for="Usuario.NomUsuario" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Usuario.Codrol" class="col-form-label">Rol:</label>
+
+                        </div>
+                        <div class="col-sm-8">
+
+                            <select asp-for="Usuario.Codrol" class="form-control  mi-selector">
+
+                                @foreach (var item in Model.Roles)
+                                {
+                                    <option value="@item.CodRol">@item.Descripcion</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Usuario.Codrol" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                        Asignar Clave
+                        <input type="checkbox" onclick="check()" id="check1"   />
+                        <span class="check"></span>
+                    </label>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label asp-for="Usuario.Clave" class="col-form-label"> Contraseña:</label>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+
+
+                                    <input readonly id="ClavePaso" type="password" asp-for="Usuario.Clave" onchange="javascript: ValidacionPassword();" class="form-control" />
+                                    <span asp-validation-for="Usuario.Clave" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-form-label">Repetir Contraseña:</label>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+
+
+                                    <input readonly id="confirmacionPass" type="password" onchange="javascript: ValidacionPassword();" maxlength="30" class="form-control" />
+                                    <span id="confirmacionPassSpan" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button id="Guardar1" type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

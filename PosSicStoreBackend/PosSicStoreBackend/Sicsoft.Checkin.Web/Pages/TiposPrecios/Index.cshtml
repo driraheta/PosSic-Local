@@ -1,0 +1,226 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.TiposPrecios.IndexModel
+@{
+    ViewData["Title"] = "Tipos Precios Lista";
+}
+@using System.Globalization;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Resumen</strong>
+    </li>
+}
+
+@section TitleAction{
+    <a asp-page="Nuevo" class="btn btn-primary" title="Agregar"><i class="fa fa-plus"></i> Agregar</a>
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+
+            $('.dataTables-example').DataTable({
+                pageLength: 10,
+                responsive: true,
+
+
+            });
+
+        });
+        var ids = 0;
+     function onClickModal(id) {
+        ids = id;
+        //$("#Eliminar").show();
+        Swal.fire({
+            title: '¿Desea eliminar este tipo de precio?',
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: `Aceptar`,
+            denyButtonText: `Cancelar`,
+            customClass: {
+                confirmButton: 'swalBtnColor',
+                denyButton: 'swalDeny'
+            },
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+
+                Eliminar();
+
+            }
+        })
+
+
+    }
+        function  Eliminar() {
+
+         $.ajax({
+                        type: 'GET',
+                        dataType: 'json',
+                        url: '@Url.Page("Index", "Eliminar")',
+                        data: { id: ids },
+             success: function (result) {
+                 $("#divProcesando").modal("hide");
+                             if (result == false) {
+                                 ids = 0;
+                                 Swal.fire({
+                                     icon: 'error',
+                                     title: 'Oops...',
+                                     text: 'Ha ocurrido un error al intentar eliminar'
+
+                                 })
+                                 //$("#Eliminar").hide();
+                                // $("#Error").show();
+
+                             } else {
+                                 Swal.fire({
+                                     title: "Ha sido eliminado con éxito",
+
+                                     icon: 'success',
+                                     showCancelButton: false,
+                                     customClass: {
+                                         confirmButton: 'swalBtnColor',
+
+                                     },
+                                     confirmButtonText: 'OK'
+                                 }).then((result) => {
+                                     if (result.isConfirmed) {
+                                         location.reload();
+                                     }
+                                 })
+                             }
+             },
+             beforeSend: function () {
+                 $("#divProcesando").modal("show");
+             }
+                     })
+        }
+        function cerrarModalError() {
+            $("#Error").hide();
+        }
+    function onClickCerrarModal() {
+        ids = 0;
+        $("#Eliminar").hide();
+    }
+    </script>
+}
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+<div class="ibox ">
+
+
+    <div class="ibox-content lista">
+        <br />
+        <div class="row">
+            <div class="col-md-3">
+
+
+                <h2>Tipos Precios</h2>
+            </div>
+            <div class="col-md-6">
+                <div class="m-b-lg">
+                    <form method="get">
+                        <div class="form-row">
+                            <div class="input-group input-group-sm  col-md-12">
+                                <input asp-for="filtro.Texto" class="form-control" placeholder="Buscar Tipos de Precio">
+                                <span class="input-group-append">
+                                    <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+
+
+                    <div class="">
+
+
+
+                        <p style="font-size:14px;">Se encontraron @Model.TP.Length registros de tipos de precios.</p>
+
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+        <div class="table-responsive" style="padding:inherit;">
+            <table class="table table-striped dataTables-example" style="width: 100%;">
+                <thead>
+                    <tr>
+
+                        <td align="center" style="width: 25%;"><h3>Código de Tipo </h3></td>
+                        <td align="center" style="width: 50%;"><h3>Nombre de TIpo</h3></td>
+
+
+                        <td align="center"><h3>Acción</h3></td>
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.TP)
+                    {
+                        <tr>
+
+                            <td align="center" style="padding-top:15px;">
+                                <p style="font-size:15px;"> @item.CodPrecio</p>
+                            </td>
+                            @*<td align="center" style="padding-top:15px;"><h3> @item.NombreTipoHab</h3></td>*@
+                            <td align="left" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @item.NomLista </p></td>
+
+                            <td align="center" style="padding-top:15px;">
+                                <a asp-page="./Editar" asp-route-id="@item.CodPrecio" class="fa fa-edit icono"> </a> &nbsp;
+                                <a onclick="javascript: onClickModal('@item.CodPrecio')" class="fa fa-trash icono"></a>
+
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <a asp-page="Nuevo" style="color: #FF0000;" title="Agregar"><i class="fa fa-plus"></i> Agregar</a>
+    </div>
+</div>
+
+
+<!--Modal Eliminar-->
+<div class="modal" id="Eliminar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-title">
+
+                <center><h2 class="modal-title">¿Está seguro que desea eliminar este tipo ?</h2></center>
+            </div>
+            <div class="modal-footer">
+                <center>
+
+                    <button title="Cancelar" type="button" class="btn btnpage" style="border-radius:17px; width: 111px;" onclick="javascript: onClickCerrarModal()" title="Editar"><a style="text-decoration:none; color:black;" data-dismiss="modal">Cancelar</a></button>
+                    &nbsp;
+                    <button title="Eliminar" type="button" class="btn btn btn-primary" title="Eliminar" id="Guardar" style="border-radius: 20px;" onclick="javascript: Eliminar()">Aceptar</button>
+                </center>
+            </div>
+
+
+        </div>
+    </div>
+</div>

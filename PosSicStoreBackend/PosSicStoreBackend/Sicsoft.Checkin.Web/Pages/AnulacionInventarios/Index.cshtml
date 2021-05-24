@@ -1,0 +1,252 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.AnulacionInventarios.IndexModel
+@{
+    ViewData["Title"] = "Inventario(Anulación)";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a>Movimientos de Inventario</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Anulación </strong>
+    </li>
+}
+@section TitleAction{
+
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+    $(document).ready(function () {
+        jQuery(document).ready(function ($) {
+            $(document).ready(function () {
+                $('.mi-selector').select2();
+            });
+        });
+        $(".js-example-responsive").select2({
+            width: 'resolve',// need to override the changed default
+            height: 'resolve'
+        });
+
+    });
+        var ProdCadena = [];
+        function verificarMovimientos() {
+            $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Index", "Movimientos")',
+                data: { id: $("#TipoMov").val() },
+            success: function (result) {
+
+                console.log(result);
+
+
+                var s = '';
+
+                $("#NoDoc").html('');
+                s += "<option value='00' selected> -Seleccione- </option>";
+                for (var i = 0; i < result.length; i++) {
+                    s += "<option value='" + result[i].numDocto + "'>" + result[i].numDocto + " - " + result[i].detalle + "  </option>";
+                }
+                $("#NoDoc").html(s);
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+
+         function Informacion() {
+            $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Index", "MovimientosDetalle")',
+                data: { id: $("#NoDoc").val() , codMov: $("#TipoMov").val()},
+            success: function (result) {
+
+                console.log(result);
+
+                $("#Proveedor").val(result.movimientos.proveedor);
+                $("#Fecha").val(result.movimientos.fecDocto.split("T")[0]);
+                $("#Detalle").val(result.movimientos.detalle);
+                console.log(result.detalle.length);
+                for (var i = 0; i < result.detalle.length; i++) {
+                    var detalle = {
+                        codPro: result.detalle[i].codPro,
+                        NomPro: result.detalle[i].nomPro ,
+                        PreVta: result.detalle[i].costoPro,
+                        cantidad: result.detalle[i].cantidad
+                    };
+                    ProdCadena.push(detalle);
+                }
+                RellenaTabla();
+ 
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+        function RellenaTabla() {
+            console.log(ProdCadena);
+            var sOptions = '';
+
+            $("#tbody").html('');
+
+            for (var i = 0; i < ProdCadena.length; i++) {
+                sOptions += '<tr>'
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].codPro + '</p></td>';
+                sOptions += '<td align="left" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].NomPro + '</p></td>';
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].cantidad + '</p></td>';
+                sOptions += '<td align="right" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].PreVta + '</p></td>';
+            
+                
+
+
+                sOptions += '</tr>'
+            }
+            $("#tbody").html(sOptions);
+        }
+        function cerrarModalError() {
+            $("#Error").hide();
+        }
+
+    </script>
+
+}
+
+
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox">
+        <div class="ibox-title">
+            <h2>Movimiento de Inventarios (Anulación)</h2>
+        </div>
+        <div class="ibox-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-form-label">Tipo Movimiento:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <select asp-for="Objeto.EncMovInv.CodMov" id="TipoMov" onchange="javascript: verificarMovimientos();" class="form-control  mi-selector">
+                                <option value="00" selected>-Seleccione-</option>
+                                @foreach (var item in Model.Tipos)
+                                {
+                                    <option value="@item.CodMov">@item.NomMov</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <label class="col-form-label">Proveedor:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <input type="text" readonly id="Proveedor" class="form-control">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <label class="col-form-label">No. Documento:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <select id="NoDoc" asp-for="Objeto.EncMovInv.NumDocto" onchange="javascript: Informacion();" class="form-control  mi-selector">
+                                <option value="00" selected>-Seleccione-</option>
+
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <label class="col-form-label">Fecha:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <input type="text" readonly id="Fecha" class="form-control">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <label class="col-form-label">Detalle:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input type="text" readonly id="Detalle" class="form-control">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="ibox">
+        <div class="ibox-title">
+            <h2>Listado de Productos</h2>
+        </div>
+        <div class="ibox-content">
+            <div class="table-responsive tableFixHead" style="padding:inherit; overflow:scroll;    z-index: 5; height: 290px;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+
+                            <th align="center" style=" text-align: center;"><h3>Código</h3></th>
+                            <th align="center" style=" text-align: center;"><h3>Nombre </h3></th>
+                            <th align="center" style=" text-align: center;"><h3>Cantidad</h3></th>
+                            <th align="center" style=" text-align: center;"><h3>Costo</h3></th>
+                        </tr>
+
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="d-flex justify-content-end">
+        <button onclick="javascript: Generar();" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

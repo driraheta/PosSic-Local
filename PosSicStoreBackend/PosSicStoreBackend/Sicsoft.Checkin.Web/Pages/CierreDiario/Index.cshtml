@@ -1,0 +1,130 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.CierreDiario.IndexModel
+@{
+    ViewData["Title"] = "Cierre Diario";
+}
+@using System.Globalization;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Cierre Diario</strong>
+    </li>
+}
+
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var meses = new Array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+            @*var DiaSistema = parseInt("@Model.Cierre.Fecha.Day");*@
+            var DiaSistema = new Date("@Model.Cierre.Fecha.Year", "@(Model.Cierre.Fecha.Month - 1)", "@Model.Cierre.Fecha.Day");
+
+            var DiaActual = new Date();
+
+            if (DiaSistema > DiaActual) {
+                Swal.fire({
+                    title: "Fecha Mayor " + DiaActual.getDate() + "/" + meses[DiaActual.getMonth()] + "/" + DiaActual.getFullYear(),
+                    text: "La fecha del sistema: " + DiaSistema.getDate() + "/" + meses[DiaSistema.getMonth()] + "/" + DiaSistema.getFullYear() + " es mayor a la fecha actual: " + DiaActual.getDate() + "/" + meses[DiaActual.getMonth()] + "/" + DiaActual.getFullYear() + ". Si se efectúa el cierre, podria tener adelantada la fecha en más de un día",
+                    icon: 'warning',
+                     
+                    showDenyButton: false,
+                    showCancelButton: false,
+                    confirmButtonText: `Aceptar`,
+
+                    denyButtonText: `Cancelar`,
+                    customClass: {
+                        confirmButton: 'swalBtnColor',
+                        denyButton: 'swalDeny'
+                    },
+                })
+            }
+
+            console.log("FEcha del server: " + DiaSistema);
+
+
+        });
+
+        function Guardar() {
+            Swal.fire({
+                title: '¿Desea generar el cierre Diario?',
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: `Aceptar`,
+
+                denyButtonText: `Cancelar`,
+                customClass: {
+                    confirmButton: 'swalBtnColor',
+                    denyButton: 'swalDeny'
+                },
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    var resultado = $("#formTipos").submit();
+                    console.log("resultado");
+
+                }
+            })
+
+
+
+        }
+
+    </script>
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+
+<form method="post" id="formTipos">
+    <div class="ibox">
+        <div class="ibox-title">
+            <h2>Cierre Diario</h2>
+        </div>
+
+
+        <div class="ibox-content lista">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-sm-4">
+
+                </div>
+                <div class="col-sm-4">
+                    <div class="row">
+
+                    <div class="col-sm-5">
+                        <label class="col-form-label">Fecha del Cierre:</label>
+
+                    </div>
+                    <div class="col-sm-7">
+
+                        <input placeholder="Fecha" type="date" readonly asp-for="Cierre.Fecha" class="form-control" />
+
+                    </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-w-m btn-primary" onclick="javascript: Guardar();" title="Guardar">Guardar</button>
+    </div>
+</form>

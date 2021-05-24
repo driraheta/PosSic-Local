@@ -1,0 +1,82 @@
+﻿
+@{ 
+    var CssVersion = System.Configuration.ConfigurationManager.AppSettings["CssVersion"];
+    var JsVersion = System.Configuration.ConfigurationManager.AppSettings["JsVersion"];
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap.min.css?@CssVersion" rel="stylesheet" />
+    <link href="~/Content/animate.css?@CssVersion" rel="stylesheet" />
+    <link href="~/Content/style.css?@CssVersion" rel="stylesheet" />
+    <link href="~/Content/LightSkin.css?@CssVersion" rel="stylesheet" />
+    <link href="~/fonts/font-awesome/css/font-awesome.min.css?@CssVersion" rel="stylesheet" />
+    <script type="text/javascript" src="~/Scripts/jquery-3.1.1.min.js?@JsVersion"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.validate.min.js?@JsVersion"></script>
+    <script type="text/javascript" src="~/Scripts/plugins/toastr/toastr.min.js?@JsVersion"></script>
+    <script type="text/javascript" src="~/Scripts/Views/Comun.js?@JsVersion"></script>
+
+    <link href="~/Content/plugins/toastr/toastr.min.css" rel="stylesheet" />
+    <link href="~/Content/ComunStyle.css?@CssVersion" rel="stylesheet" />
+    <script>
+        function ValidaSessionSinToken() {
+            if (sessionStorage.getItem("Token") == undefined || sessionStorage.getItem("Token") == "" || sessionStorage.getItem("Token") == null) {
+                window.location.href = '../../LogIn/Index';
+            }
+        }
+
+        window.onload = function () {
+            ValidaSessionSinToken();
+        }
+    </script>
+</head>
+<body class="light-skin">
+
+    <!-- Wrapper-->
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        @Html.Partial("_Navigation")
+
+        <!-- Page wraper -->
+        <div id="page-wrapper" class="gray-bg">
+
+            <!-- Top Navbar -->
+            @Html.Partial("_TopNavbar")
+
+            <!-- Main view  -->
+            @RenderBody()
+
+            @Html.Partial("Mensajes")
+
+            <!-- Footer -->
+            @Html.Partial("_Footer")
+        </div>
+        <!-- End page wrapper-->
+
+    </div>
+    <!-- End wrapper-->
+    @section Styles {
+        @Styles.Render("~/plugins/toastrStyles")
+    }
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/plugins/metsiMenu")
+    @Scripts.Render("~/plugins/pace")
+    @Scripts.Render("~/plugins/slimScroll")
+    @Scripts.Render("~/bundles/inspinia")
+    @Scripts.Render("~/plugins/codeEditor")
+    @Scripts.Render("~/plugins/toastr")
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

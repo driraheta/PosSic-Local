@@ -1,0 +1,299 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.CierreCaja.IndexModel
+@{
+    ViewData["Title"] = "Cierre de Caja";
+}
+@using System.Globalization;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Cierre Caja</strong>
+    </li>
+}
+
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+
+
+
+        });
+
+        function TraerCierre() {
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: '@Url.Page("Index", "Cajero")',
+                data: { id: $("#CodCierre").val() },
+                success: function (result) {
+                    $("#divProcesando").modal("hide");
+                    console.log(result);
+
+                    if (result == "Caja se encuentra activa") {
+                        $("#CodCierre").val("NULL");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text:  result
+
+                        })
+
+                    }
+
+                    $("#codcaja").val(result.codCaja);
+                    $("#codcajero").val(result.codCajero);
+                    $("#fecCaja").val(result.fecCaja);
+
+                     
+                
+                    $("#Cajero").text(result.cortesDescripcion);
+                    $("#EfectivoC").val(result.efectivo);
+                    $("#TarjetaC").val(result.tarjetas);
+                    $("#DolaresC").val(result.dolares);
+                    $("#OtrosC").val(result.otrosPagos);
+                    $("#MtoVendido").val(result.mtoVendido);
+                    $("#MtoApertura").val(result.montoApertura);
+                    $("#CortEfectivo").val(result.cortesEfectivo);
+                    $("#TipoCambio").val(result.tipoCambio);
+                    $("#Diferencia").val(0);
+
+                    $("#Efectivo").val(0);
+                    $("#Tarjeta").val(0);
+                    $("#Dolares").val(0);
+                    $("#Otros").val(0);
+                    CalculaDiferencia();
+
+                },
+                beforeSend: function () {
+                    $("#divProcesando").modal("show");
+                },
+                error: function (ex) {
+                    $("#divProcesando").modal("hide");
+                    console.log(ex);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: ex.responseText
+
+                    })
+                }
+                
+            })
+        
+        }
+
+        function CalculaDiferencia() {
+
+            var efectivo = parseFloat($("#Efectivo").val());
+            var tarjeta = parseFloat($("#Tarjeta").val());
+            var dolares = parseFloat($("#Dolares").val()) * parseFloat($("#TipoCambio").val());
+            var otros = parseFloat($("#Otros").val());
+            var cortesEfectivo = parseFloat($("#CortEfectivo").val());
+
+            var total = parseFloat(efectivo + tarjeta + dolares + otros + cortesEfectivo);
+            var totalGeneral = parseFloat($("#MtoVendido").val());
+            console.log(total);
+            console.log(totalGeneral);
+            console.log(dolares);
+            $("#Diferencia").val((total - totalGeneral).toFixed(2));
+
+        }
+
+        function Guardar() {
+            Swal.fire({
+                title: '¿Desea generar el cierre de caja?',
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: `Aceptar`,
+
+                denyButtonText: `Cancelar`,
+                customClass: {
+                    confirmButton: 'swalBtnColor',
+                    denyButton: 'swalDeny'
+                },
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $("#formTipos").submit();
+
+                }
+            })
+
+
+           
+        }
+
+    </script>
+   
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+    <div class="ibox">
+        <div class="ibox-content">
+            <form method="get">
+                <h2>Datos de Caja:</h2>
+
+                <div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select asp-for="filtro.Codigo" id="CodCierre" class="form-control  mi-selector" onchange="javascript: TraerCierre();">
+                                <option value="NULL" selected>-Seleccione Cierre-</option>
+                                @foreach (var item in Model.Cierre)
+                                {
+                                    <option value="@item.CodCaja">@item.CodCaja - @item.CodCajero</option>
+                                }
+                            </select>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label style="font-weight: bold; font-size: 14px;">Cajero:</label>
+                            <label class="col-form-label" id="Cajero"></label>
+                          
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<form method="post" id="formTipos" >
+    <div class="ibox">
+        <div class="ibox-title">
+            <h2>Conteo Físico</h2>
+        </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="CierreModel.CodCaja" id="codcaja" hidden />
+        <input asp-for="CierreModel.CodCajero" id="codcajero" hidden />
+        <input asp-for="CierreModel.FecCaja" id="fecCaja" hidden />
+        <input id="TipoCambio" hidden />
+        <div class="ibox-content lista">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="col-form-label">Efectivo Colones:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Efectivo" asp-for="CierreModel.Efectivo" onchange="javascript: CalculaDiferencia();" type="number" id="Efectivo" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Tarjeta:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Tarjeta" type="number" asp-for="CierreModel.Tarjetas" onchange="javascript: CalculaDiferencia();" id="Tarjeta" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Efectivo Dólares:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Dólares" type="number" asp-for="CierreModel.Dolares" onchange="javascript: CalculaDiferencia();" id="Dolares" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Otros:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Otros" type="number" asp-for="CierreModel.OtrosPagos" onchange="javascript: CalculaDiferencia();" id="Otros" class="form-control" />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ibox">
+        <div class="ibox-title">
+            <h2>Balance de Caja</h2>
+        </div>
+        <div class="ibox-content lista">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="col-form-label">Efectivo Colones:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Efectivo" readonly type="number" id="EfectivoC" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Tarjeta:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Tarjeta" readonly type="number" id="TarjetaC" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Efectivo Dólares:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Dólares" readonly type="number" id="DolaresC" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Otros:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Otros" readonly type="number" id="OtrosC" class="form-control" />
+
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="col-form-label">Monto Vendido:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Monto Vendido" asp-for="CierreModel.MtoVendido" readonly type="number" id="MtoVendido" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Monto Apertura:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="MtoApertura" readonly type="number" id="MtoApertura" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Cortes Efectivo:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Cortes Efectivo" readonly type="number" id="CortEfectivo" class="form-control" />
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Diferencia:</label>
+                    <div class="col-sm-12">
+                        <input placeholder="Diferencia" readonly type="number" id="Diferencia" asp-for="CierreModel.Diferencia" class="form-control" />
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+ 
+    <div class="d-flex justify-content-end">
+        <button type="button" onclick="javascript: Guardar();" class="btn btn-w-m btn-primary"  title="Guardar">Guardar</button>
+    </div>
+    </form>

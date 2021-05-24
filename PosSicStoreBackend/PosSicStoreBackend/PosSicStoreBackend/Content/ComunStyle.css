@@ -1,0 +1,25 @@
+﻿.form-group {
+    margin-bottom: 0px;
+}
+
+#toast-container > .toast-error:before {
+    display: none;
+}
+
+#toast-container > .toast-success:before {
+    display: none;
+}
+
+#toast-container > .toast-warning:before {
+    display: none;
+}
+
+.footer {
+    position: fixed;
+}
+
+label.error {
+    position: absolute;
+    top: 31px;
+    left: 0%;
+}

@@ -1,0 +1,174 @@
+﻿@page "{id}"
+@model Sicsoft.Checkin.Web.Pages.Proveedores.EditarModel
+@{
+    ViewData["Title"] = "Proveedores";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a asp-page="./Index">Lineas</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Editar </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+
+        Array.prototype.forEach.call(document.body.querySelectorAll("*[data-mask]"), applyDataMask);
+        console.log(document.body.querySelectorAll("*[data-mask]"));
+        function applyDataMask(field) {
+            var mask = field.dataset.mask.split('');
+
+            // For now, this just strips everything that's not a number
+            function stripMask(maskedData) {
+                function isDigit(char) {
+                    return /\d/.test(char);
+                }
+                return maskedData.split('').filter(isDigit);
+            }
+
+            // Replace `_` characters with characters from `data`
+            function applyMask(data) {
+                return mask.map(function (char) {
+                    if (char != '_') return char;
+                    if (data.length == 0) return char;
+                    return data.shift();
+                }).join('')
+            }
+
+            function reapplyMask(data) {
+                return applyMask(stripMask(data));
+            }
+
+            function changed() {
+                var oldStart = field.selectionStart;
+                var oldEnd = field.selectionEnd;
+
+                field.value = reapplyMask(field.value);
+
+                field.selectionStart = oldStart;
+                field.selectionEnd = oldEnd;
+            }
+
+            field.addEventListener('click', changed)
+            field.addEventListener('keyup', changed)
+        }
+    </script>
+}
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox ">
+        <div class="ibox-title">
+
+            <h2>Información Proveedor</h2>
+
+        </div>
+        <div class="ibox-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Proveedor.CodProveedor" class="col-form-label">Código:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.CodProveedor" readonly placeholder="Código" class="form-control">
+                            <span asp-validation-for="Proveedor.CodProveedor" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Proveedor.Email" class="col-form-label">Email:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.Email" type="email" placeholder="Email" class="form-control">
+                            <span asp-validation-for="Proveedor.Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Proveedor.Telefono" class="col-form-label">Teléfono:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.Telefono" type="text" data-mask="____-____" placeholder="Teléfono del proveedor" class="form-control">
+                            <span asp-validation-for="Proveedor.Telefono" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Proveedor.Celular" class="col-form-label">Celular:</label>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.Celular" type="text" data-mask="____-____" placeholder="Número de celular" class="form-control">
+                            <span asp-validation-for="Proveedor.Celular" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Proveedor.NomProveedor" class="col-form-label">Nombre Proveedor:</label>
+                        </div>
+                        <div class="col-sm-6">
+
+
+                            <input asp-for="Proveedor.NomProveedor" placeholder="Nombre del proveedor" class="form-control" />
+                            <span asp-validation-for="Proveedor.NomProveedor" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Proveedor.Encargado" class="col-form-label">Encargado:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.Encargado" placeholder="Nombre del encargado" class="form-control">
+                            <span asp-validation-for="Proveedor.Encargado" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Proveedor.Fax" data-mask="____-____" class="col-form-label">Fax:</label>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.Fax" placeholder="Fax del proveedor" class="form-control">
+                            <span asp-validation-for="Proveedor.Fax" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

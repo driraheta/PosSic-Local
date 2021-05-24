@@ -1,0 +1,406 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security.Claims;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.Extensions.Configuration;
+@using Refit;
+@using Sicsoft.Checkin.Web.Models;
+@inject IHttpContextAccessor httpContextAccessor
+ @{
+     var Roles = ((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Split("|");
+}
+<style>
+</style>
+<nav class="navbar-default navbar-static-side"   role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element ">
+                    <img alt="image" class="rounded-circle m-l-xl" src="~/img/profile_small.png">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#" style="text-align: left;">
+
+
+
+                        <span class="block m-t-xs font-bold"> @User.Identity.Name <b class="caret"></b></span>
+
+
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs" x-placement="bottom-start" style="position: absolute; top: 91px; left: 0px; will-change: top, left;">
+                        <li><a class="dropdown-item" asp-page="/Account/CambiarContraseña">Cambiar Clave</a></li>
+                        @if (!string.IsNullOrEmpty(Roles.Where(a => a == "1").FirstOrDefault()))
+                        {
+                            <li><a class="dropdown-item" asp-page="/Usuarios/Index">Usuarios</a></li>
+                        }
+                        @if (!string.IsNullOrEmpty(Roles.Where(a => a == "2").FirstOrDefault()))
+                        {
+                            <li><a class="dropdown-item" asp-page="/SeguridadRolesModulos/Index">Roles</a></li>
+                        }
+
+                    </ul>
+                </div>
+                <div>
+
+                </div>
+            </li>
+
+            <li class="">
+                <a href="#">  <span class="nav-label"> Mantenimientos</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" aria-expanded="false">
+
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Inventarios</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("13"))
+                            {
+
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Lineas")?"active":null)">
+                                    <a asp-page="/Lineas/Index"><i class=""></i><span class="nav-label" id="InicioButton">Líneas</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("15"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Proveedores") ? "active" : null)">
+                                    <a asp-page="/Proveedores/Index"><i class=""></i><span class="nav-label" id="InicioButton">Proveedores</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("16"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Productos") ? "active" : null)">
+                                    <a asp-page="/Productos/Index"><i class=""></i><span class="nav-label" id="InicioButton">Productos</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("24"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Clientes") ? "active" : null)">
+                                    <a asp-page="/Clientes/Index"><i class=""></i><span class="nav-label" id="InicioButton">Clientes</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("21"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Tipos Movimientos") ? "active" : null)">
+                                    <a asp-page="/TiposMovimientos/Index"><i class=""></i><span class="nav-label" id="InicioButton">Tipos Movimientos</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Tipos Precios") ? "active" : null)">
+                                <a asp-page="/TiposPrecios/Index"><i class=""></i><span class="nav-label" id="InicioButton">Tipos Precios</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Ventas</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("17"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Cajas") ? "active" : null)">
+                                    <a asp-page="/Cajas/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cajas</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("11"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Cajeros") ? "active" : null)">
+                                    <a asp-page="/Cajeros/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cajeros</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("12"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Vendedores") ? "active" : null)">
+                                    <a asp-page="/Vendedores/Index"><i class=""></i><span class="nav-label" id="InicioButton">Vendedores</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+
+                        </ul>
+                    </li>
+
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Formas de Pago</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("22"))
+                            {
+
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Bancos") ? "active" : null)">
+                                    <a asp-page="/Bancos/Index"><i class=""></i><span class="nav-label" id="InicioButton">Bancos</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("23"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Tarjetas") ? "active" : null)">
+                                    <a asp-page="/Tarjetas/Index"><i class=""></i><span class="nav-label" id="InicioButton">Tarjetas</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                            @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("28"))
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Otros") ? "active" : null)">
+                                    <a asp-page="/Otros/Index"><i class=""></i><span class="nav-label" id="InicioButton">Otros</span><span class="fa arrow"></span></a>
+
+                                </li>
+                            }
+
+                        </ul>
+                    </li>
+
+                </ul>
+            </li>
+
+            <li class="">
+                <a href="#">  <span class="nav-label"> Movimientos</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" aria-expanded="false">
+
+                    @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("18"))
+                    {
+
+                        <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("MovimientoInventarios")?"active":null)">
+                            <a asp-page="/MovimientoInventarios/Index"><i class=""></i><span class="nav-label" id="InicioButton">Inventarios</span><span class="fa arrow"></span></a>
+
+                        </li>
+                    }
+
+                    @*@if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("19"))
+                {
+
+                    <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("AnulacionInventarios")?"active":null)">
+                        <a asp-page="/AnulacionInventarios/Index"><i class=""></i><span class="nav-label" id="InicioButton">Inventarios (Anulación)</span><span class="fa arrow"></span></a>
+
+                    </li>
+                }*@
+
+                    @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("20"))
+                    {
+
+                        <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Compras/Index")?"active":null)">
+                            <a asp-page="/Compras/Index"><i class=""></i><span class="nav-label" id="InicioButton">Compras </span><span class="fa arrow"></span></a>
+
+                        </li>
+                    }
+
+
+                </ul>
+            </li>
+
+            <li class="">
+                <a href="#">  <span class="nav-label"> Parámetros</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" aria-expanded="false">
+
+
+
+                    <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("MovimientoInventarios")?"active":null)">
+                        <a asp-page="/Parametro/Index" asp-route-id="1"><i class=""></i><span class="nav-label" id="InicioButton">Configurar</span><span class="fa arrow"></span></a>
+
+                    </li>
+
+
+
+
+
+                </ul>
+            </li>
+
+            <li class="">
+                <a href="#">  <span class="nav-label"> Reportes</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" aria-expanded="false">
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Ventas</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Lineas")?"active":null)">
+                                <a asp-page="/Reportes/Lineas"><i class=""></i><span class="nav-label" id="InicioButton">Líneas</span><span class="fa arrow"></span></a>
+
+                            </li>
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Cajeros")?"active":null)">
+                                <a asp-page="/Reportes/Cajeros"><i class=""></i><span class="nav-label" id="InicioButton">Cajeros</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Vendedores")?"active":null)">
+                                <a asp-page="/Reportes/Vendedores"><i class=""></i><span class="nav-label" id="InicioButton">Vendedores</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "43").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasDiarias") ? "active" : null)">
+                                <a asp-page="/Reportes/VentasDiarias"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Diarias</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "45").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasXProducto") ? "active" : null)">
+                                <a asp-page="/Reportes/VentasXProducto"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Producto</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "44").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasResumen") ? "active" : null)">
+                                <a asp-page="/Reportes/VentasResumen"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Resumen</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasXHora")?"active":null)">
+                                <a asp-page="/Reportes/VentasXHora"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Horas</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "42").FirstOrDefault()))
+                        {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/CierreCaja") ? "active" : null)">
+                                <a asp-page="/Reportes/CierreCaja"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Caja</span><span class="fa arrow"></span></a>
+
+                            </li>
+                        }
+
+
+                        </ul>
+                    </li>
+
+                    <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Clientes")?"active":null)">
+                        <a asp-page="/Reportes/Clientes"><i class=""></i><span class="nav-label" id="InicioButton">Clientes</span><span class="fa arrow"></span></a>
+
+                    </li>
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Apartados</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "40").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Apartados") ? "active" : null)">
+                                <a asp-page="/Reportes/Apartados"><i class=""></i><span class="nav-label" id="InicioButton">Apartados</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "41").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Abonos") ? "active" : null)">
+                                <a asp-page="/Reportes/Abonos"><i class=""></i><span class="nav-label" id="InicioButton">Abonos</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Inventarios</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Productos")?"active":null)">
+                                <a asp-page="/Reportes/Productos"><i class=""></i><span class="nav-label" id="InicioButton">Productos</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/EntradasySalidas") ? "active" : null)">
+                                <a asp-page="/Reportes/EntradasySalidas"><i class=""></i><span class="nav-label" id="InicioButton">Entradas Salidas</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Compras")?"active":null)">
+                                <a asp-page="/Reportes/Compras"><i class=""></i><span class="nav-label" id="InicioButton">Compras</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/MovimientoInventarios")?"active":null)">
+                                <a asp-page="/Reportes/MovimientoInventarios"><i class=""></i><span class="nav-label" id="InicioButton">Mov Inventarios</span><span class="fa arrow"></span></a>
+
+                            </li>
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/CatalogoProductos")?"active":null)">
+                                <a asp-page="/Reportes/CatalogoProductos"><i class=""></i><span class="nav-label" id="InicioButton">Catálogo Productos</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Kardex") ? "active" : null)">
+                                <a asp-page="/Reportes/Kardex"><i class=""></i><span class="nav-label" id="InicioButton">Kardex</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Histórico</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse" aria-expanded="false">
+
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasXvendedor")?"active":null)">
+                                <a asp-page="/Reportes/VentasXvendedor"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Vendedor</span><span class="fa arrow"></span></a>
+
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+
+                    
+
+
+
+
+                </ul>
+                    </li>
+
+
+
+                    <li class="">
+                        <a href="#">  <span class="nav-label"> Procesos</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+
+
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "27").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("CierreCaja") ? "active" : null)">
+                                <a asp-page="/CierreCaja/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Caja</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "26").FirstOrDefault()))
+                    {
+                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("CierreDiario") ? "active" : null)">
+                                <a asp-page="/CierreDiario/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Diario</span><span class="fa arrow"></span></a>
+
+                            </li>
+                    }
+
+                        </ul>
+                    </li>
+
+                </ul>
+
+    </div>
+</nav>

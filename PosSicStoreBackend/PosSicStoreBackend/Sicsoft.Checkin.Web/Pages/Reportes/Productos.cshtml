@@ -1,0 +1,256 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Reportes.ProductosModel
+@{
+    ViewData["Title"] = "Reporte Productos";
+}
+@using System.Globalization;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+
+
+}
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Reportes</strong>
+    </li>
+}
+
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+            document.getElementById('imgProd').src = Url + "/Imagenes/Productos/cm.jpg";
+
+
+        });
+
+        function reportePdf() {
+            var combo = document.getElementById("CodProv");
+            var Proveedor = combo.options[combo.selectedIndex].text;
+            var item = "";
+            item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
+            item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
+            item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
+            item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Productos</b></p>';
+            item += '<br>';
+            if (Proveedor != "00") {
+                item += '<p style="text-align: left; "><strong>Proveedor</strong>: ' + Proveedor + '</p>';
+            }
+            item += $(".table-responsive").html();
+            var opt = {
+                margin: [10, 5, 15, 5],
+                pagebreak: { avoid: 'tr' },
+
+                html2canvas: { scale: 2 },
+                jsPDF: { format: 'letter', orientation: 'portrait' }
+            };
+
+
+
+            html2pdf().set(opt)
+                .from(item)
+                .save("Reporte_de_Productos.pdf");
+
+        }
+
+        function Excel() {
+            // $("#tlbIndexDash1").tableExport();
+            var table = $(".table-responsive");
+            var html = table.html();
+            var htmls = "";
+            var uri = 'data:application/vnd.ms-Excel;base64,';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            };
+
+            var format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                })
+            };
+
+            htmls = html;
+
+            var ctx = {
+                worksheet: 'Reporte Productos',
+                table: htmls
+            }
+
+
+            var link = document.createElement("a");
+            link.download = "Reporte de Productos.xls";
+            link.href = uri + base64(format(template, ctx));
+            link.click();
+        }
+    </script>
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+
+<div class="ibox">
+    <div class="ibox-content">
+        <form method="get">
+            <h2>Filtros:</h2>
+
+            <div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <select asp-for="filtro.CodProveedor" id="CodProv" class="form-control  mi-selector">
+                            <option value="00" selected>-Seleccione Proveedor-</option>
+                            @foreach (var item in Model.Proveedores)
+                            {
+                                <option value="@item.CodProveedor">@item.CodProveedor - @item.NomProveedor</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <select asp-for="filtro.LineaInicial" class="form-control  mi-selector">
+                            <option value="00" selected>-Seleccione Linea Inicial-</option>
+                            @foreach (var item in Model.Lineas)
+                            {
+                                <option value="@item.CodLinea">@item.CodLinea - @item.NomLinea</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <select asp-for="filtro.LineaFinal" class="form-control  mi-selector">
+                            <option value="00" selected>-Seleccione Linea Final-</option>
+                            @foreach (var item in Model.Lineas)
+                            {
+                                <option value="@item.CodLinea">@item.CodLinea - @item.NomLinea</option>
+                            }
+                        </select>
+
+
+
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                            Con Existencia
+                            <input type="checkbox" id="check1" asp-for="filtro.Existencia" />
+                            <span class="check"></span>
+                        </label>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-5">
+
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+
+                        <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>&nbsp;
+                        <a onclick="javascript: reportePdf()" title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        <a onclick="javascript: Excel()" title="Exportar a Excel" class="btn btnExcel">EXCEL</a>
+
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="ibox ">
+
+
+    <div class="ibox-content lista">
+ 
+ 
+        <br />
+        <div class="table-responsive" style="padding:inherit;">
+            <table class="table table-striped dataTables-example" style="width: 100%;">
+                <thead>
+                    <tr>
+
+                        <td align="center" style="width: 10%;"><h3>Código</h3></td>
+                        <td align="center" style="width: 30%;"><h3>Nombre </h3></td>
+                        <td align="center" style="width: 20%;"><h3>Proveedor</h3></td>
+                        <td align="center" style="width: 10%;"><h3>Existencia</h3></td>
+                        <td align="center" style="width: 10%;"><h3>Precio</h3></td>
+                        <td align="center" style="width: 10%;"><h3>Total</h3></td>
+
+
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.Producto.ToList())
+                    {
+                    <tr>
+
+                        <td align="center" style=" ">
+                            <p style="font-size:15px; font-weight: bold;"> @item.CodPro</p>
+                        </td>
+                        @*<td align="center" style="padding-top:15px;"><h3> @item.NombreTipoHab</h3></td>*@
+                        <td align="left" style=""><p style="font-size:15px;">  @item.NomPro </p></td>
+                        <td align="center" style="">
+                            @if (Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault() != null)
+                            {
+                                <p style="font-size:15px;"> @Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault().NomProveedor</p>
+
+                            }
+                        </td>
+
+                        <td align="center" style="">
+                            <p style="font-size:15px;"> @item.Existencia</p>
+                        </td>
+                        <td align="right" style="">
+                            <p style="font-size:15px;"> @decimal.Round(item.PrecioVenta.Value, 2).ToString("N", formato)</p>
+                        </td>
+                        <td align="right" style="">
+                            <p style="font-size:15px;"> @decimal.Round(item.PrecioVenta.Value * item.Existencia.Value, 2).ToString("N", formato)</p>
+                        </td>
+
+                    </tr>
+
+                    }
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td align="center" style="padding-top: 15px;">
+                        <p style="font-size: 15px; font-weight: 600;">Total Productos</p>
+                    </td>
+                    <td align="center" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @Model.Producto.Sum(a => a.Existencia) </p></td>
+                    <td align="right" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @decimal.Round(Model.Producto.Sum(a => a.PrecioVenta).Value, 2).ToString("N", formato) </p></td>
+                    <td align="right" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @decimal.Round(Model.Producto.Sum(a => a.PrecioVenta * a.Existencia).Value, 2).ToString("N", formato) </p></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,613 @@
+﻿@page "{id}"
+
+@model Sicsoft.Checkin.Web.Pages.Productos.EditarModel
+@{
+    ViewData["Title"] = "Productos";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a asp-page="./Index">Productos</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Agregar </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+}
+
+  
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/Constantes.js"></script>
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+            //document.getElementById('imgProd').src = Url + "/Imagenes/Productos/cm.jpg";
+
+
+        });
+
+       
+
+        //function readFilePrincipal(input) {
+        //    if (input.files && input.files[0]) {
+        //        var reader = new FileReader();
+        //        reader.onload = function (e) {
+        //            document.getElementById('imgProd').src = e.target.result;
+        //            console.log(e.target.result);
+
+        //        }
+
+        //        reader.readAsDataURL(input.files[0]);
+        //    }
+        //}
+
+        function readFilePrincipal(input) {
+            if (input.files && input.files[0] && input.files[0].type.includes("image")) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('imgProd').src = e.target.result;
+                    console.log(input.files);
+
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                console.log(input.files[0].type);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Pareciera que este archivo no es una imagen'
+
+                })
+            }
+        }
+
+        var fileUploadPrincipal = document.getElementById('btnUpload');
+        fileUploadPrincipal.onchange = function (e) {
+            readFilePrincipal(e.srcElement);
+        }
+
+        function impuestoTarifaSet() {
+
+
+            var combo = document.getElementById("CodTarifa");
+            var selected = combo.options[combo.selectedIndex].text;
+            var seleccionado = selected.split("|");
+            $("#ImpuestoTarifa").val(seleccionado[1]);
+
+
+
+        }
+        function uncheckExonerado() {
+
+            var checkbox1 = document.getElementById("check1");
+            if (checkbox1.checked == true) {
+
+                $("#CodTarifa").val("01");
+                var combo = document.getElementById("CodTarifa");
+                var selected = combo.options[combo.selectedIndex].text;
+                var seleccionado = selected.split("|");
+                $('#CodTarifa')
+                    .attr('disabled', true);
+                $("#select2-CodTarifa-container").text(selected);
+
+                $("#ImpuestoTarifa").val(seleccionado[1]);
+                //$("#select2-CodTarifa-container").select2({ readonly: true }).css({ '-moz-appearance': 'none', '-webkit-appearance': 'none' });
+            } else {
+                $('#CodTarifa')
+                    .attr('disabled', false);
+            }
+
+
+
+        }
+
+        function checkPesoBarras() {
+            var checkbox1 = document.getElementById("chPeso");
+            var prefijoRomanas = $("#PrefijoRomanas").val();
+            var txtCodBarras = $("#codigoBarras").val();
+
+            if (checkbox1.checked == true) {
+                if (txtCodBarras.length <= 4) {
+                    $("#codigoBarras").val(prefijoRomanas + padLeft(txtCodBarras, 4));
+                } else if (txtCodBarras.length == 7 && txtCodBarras.substring(0, 3) == prefijoRomanas) {
+
+                } else if (txtCodBarras.length < 13) {
+                    $("#spanCodBarras").text("Código de Barras Erroneo, favor verifique");
+                }
+            }
+
+            $("#codigoBarras").val();
+        }
+        function padLeft(nr, n, str) {
+            return Array(n - String(nr).length + 1).join(str || '0') + nr;
+        }
+        function onClickModal(id) {
+            ids = id;
+            var cambio = $("#CodigoCabys").val();
+
+            var nombre = $("#descCabys").val();
+
+            $("#codigobusqueda").val(cambio);
+            $("#textoCabys").text(nombre);
+            $("#Eliminar").show();
+
+
+        }
+
+        function onClickCerrarModal() {
+            ids = 0;
+            $("#Eliminar").hide();
+        }
+
+        function trCabys(id, nombre) {
+
+            var cambio = $("#CodigoCabys").val();
+
+            if (cambio == "") {
+                console.log("entra pq codigo esta vacio" + id);
+                $("#" + id).css("background-color", "lightblue");
+            } else {
+                console.log("entra pq codigo no esta vacio" + cambio + " id: " + id );
+                $("#" + cambio).css("background-color", "white");
+                $("#" + id).css("background-color", "lightblue");
+            }
+            $("#CodigoCabys").val(id);
+            $("#codigobusqueda").val(id);
+            $("#textoCabys").text(nombre);
+            $("#descCabys").val(nombre);
+
+        }
+
+        function BuscarCabys() {
+            var s = "";
+             $.ajax({
+                        type: 'GET',
+                        dataType: 'json',
+                        url: '@Url.Page("Nuevo", "Cabys")',
+                         data: { id: $("#CodProHaciendaBusqueda").val() },
+                         success: function (result) {
+                             $("#divProcesando").modal("hide");
+                             console.log(result);
+
+                             $("#bodyTable").html("");
+                             if (result.length > 0) {
+
+                                 for (var i = 0; i < result.length; i++) {
+
+                                     s += "<tr id='" + result[i].codigo + "'>";
+
+                                     s += '<td align="center" style="padding-top: 15px;">    <a onclick="javascript: trCabys(' + "'" + result[i].codigo.toString() + "'," + "'" + result[i].descripcion.toString() + "'" + ' ) " class="fa fa-check-square icono" style="color: green;"></a></td>';
+
+
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].codigo + '</p></td>';
+
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descripcion + '</p></td>';
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].impuesto + '</p></td>';
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria1 + '</p></td>';
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria2 + '</p></td>';
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria3 + '</p></td>';
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria4 + '</p></td>';
+
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria5 + '</p></td>';
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria6 + '</p></td>';
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria7 + '</p></td>';
+                                     s += '<td align="center" style="padding-top: 15px;"> <p style="font-size:15px;">' + result[i].descCategoria8 + '</p></td>';
+
+                                     s += "</tr>";
+                                 }
+                             } else {
+                                 s += "<tr> <td colspan='12'> No existen resultados para esta búsqueda </td> </tr>"
+                             }
+
+
+
+                             $("#bodyTable").html(s);
+
+
+                             var cambio = $("#codigobusqueda").val();
+                             console.log(cambio);
+                             $("#" + cambio).css("background-color", "lightblue");
+                         },
+                         beforeSend: function () {
+                             $("#divProcesando").modal("show");
+                         }
+             })
+
+
+        }
+
+    </script>
+}
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox">
+        <div class="ibox">
+            <div class="ibox-title">
+
+                <h2>Imagen del Producto</h2>
+
+            </div>
+            <div class="ibox-content">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input hidden asp-for="Parametros[0].PrefijoRomanas" id="PrefijoRomanas" />
+
+                <div class="col-sm-12">
+                    <center>
+                        @if (string.IsNullOrEmpty(Model.Producto.ImagenFullPath) || (!Model.Producto.ImagenFullPath.Contains("png") && !Model.Producto.ImagenFullPath.Contains("jpg") && !Model.Producto.ImagenFullPath.Contains("jpeg")))
+                        {
+
+                            <img id="imgProd" src="@Model.UrlImagen" alt="image" style="height:245px; width:25%;border-radius: 15px;" class="img-fluid" />
+                        }
+                        else
+                        {
+                            <img id="imgProd" src="@Model.Producto.ImagenFullPath" alt="image" style="height:245px; width:25%;border-radius: 15px;" class="img-fluid" />
+                        }
+                        <br />
+                        <br />
+                        <div class="fileinput fileinput-new testButton" data-provides="fileinput">
+                            <span style="background-color:#FF0000; border-radius: 32px;" class="btn btn-default btn-file">
+                                <span class="fileinput-new" style="color:white;">Subir Imagen</span>
+                                <span class="fileinput-exists" style="color:white;">Cambiar</span>
+                                <input class="imagenInput" onchange="readFilePrincipal(event)" accept="image/*" id="btnUpload" type="file" asp-for="Producto.Upload" />
+                            </span>
+
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ibox">
+        <div class="ibox-title">
+
+            <h2>Información Producto</h2>
+
+        </div>
+        <div class="ibox-content">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Producto.CodPro" class="col-form-label">Código Producto:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Producto.CodPro" readonly placeholder="Codigo del producto" class="form-control" />
+                            <span asp-validation-for="Producto.CodPro" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <label asp-for="Producto.CodProHacienda" class="col-form-label">Código Cabys:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <input asp-for="Producto.CodProHacienda" readonly id="CodigoCabys" placeholder="Codigo del producto ante hacienda" class="form-control" />
+
+                            <span asp-validation-for="Producto.CodProHacienda" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-4">
+                            <a class="fa fa-search" onclick="javascript: onClickModal();"></a>
+
+
+
+                        </div>
+                    </div>
+
+                    <label asp-for="Producto.CabysDescripcion" class="col-form-label">Descripción Cabys:</label>
+                    <div class="form-group row">
+
+                        <div class="col-sm-12">
+                            <textarea asp-for="Producto.CabysDescripcion" readonly id="descCabys" placeholder="descripcion del producto ante hacienda" class="form-control" rows="7"></textarea>
+
+                            <span asp-validation-for="Producto.CabysDescripcion" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Producto.UniMed" class="col-form-label">Unidad de Medida:</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input asp-for="Producto.UniMed" placeholder="unidades, servicios, etc" type="text" class="form-control" />
+                            <span asp-validation-for="Producto.UniMed" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Producto.PrecioVenta" class="col-form-label">Precio Venta:</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input asp-for="Producto.PrecioVenta" id="PrecVta" placeholder="Precio de Venta" onchange="javascript: validaNegativos(event,'PrecVta')"  pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==9) return false;"  type="number" class="form-control" />
+                            <span asp-validation-for="Producto.PrecioVenta" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Producto.CodImpuestoTarifa" class="col-form-label">Impto. Tarifa:</label>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <select asp-for="Producto.CodImpuestoTarifa" onchange="javascript: impuestoTarifaSet();" id="CodTarifa" class="form-control  mi-selector">
+                                @*<option value="00" selected>-Seleccione-</option>*@
+                                @foreach (var item in Model.Codigos)
+                                {
+                                    <option value="@item.CodTarifa">@item.Descripcion</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Producto.CodImpuestoTarifa" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-md-6">
+
+
+
+
+
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Producto.CodBarras" class="col-form-label">Código de Barras:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Producto.CodBarras" id="codigoBarras" placeholder="Codigo de barras" class="form-control" />
+                            <span asp-validation-for="Producto.CodBarras" id="spanCodBarras" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Producto.CodLinea" class="col-form-label">Línea:</label>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <select asp-for="Producto.CodLinea" class="form-control  mi-selector">
+                                <option value="00" selected>-Seleccione-</option>
+                                @foreach (var item in Model.Lineas)
+                                {
+                                    <option value="@item.CodLinea">@item.NomLinea</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Producto.CodLinea" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Producto.CodProveedor" class="col-form-label">Proveedor:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select asp-for="Producto.CodProveedor" class="form-control mi-selector">
+                                <option value="00" selected>-Seleccione-</option>
+                                @foreach (var item in Model.Proveedores)
+                                {
+                                    <option value="@item.CodProveedor">@item.NomProveedor</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Producto.CodProveedor" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Producto.NomPro" class="col-form-label">Descripción:</label>
+
+                        </div>
+                        <div class="col-sm-8">
+                            <input asp-for="Producto.NomPro" placeholder="Codigo del producto" class="form-control" />
+                            <span asp-validation-for="Producto.NomPro" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Producto.CostoPro" class="col-form-label">Costo del Producto:</label>
+
+                        </div>
+                        <div class="col-sm-4">
+                            <input asp-for="Producto.CostoPro" id="CostoProd" placeholder="Costo del producto" type="number" onchange="javascript: validaNegativos(event, 'CostoProd')" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==9) return false;" class="form-control" />
+                            <span asp-validation-for="Producto.CostoPro" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Producto.PorDescuento" class="col-form-label">Porcentaje de Descuento:</label>
+
+                        </div>
+                        <div class="col-sm-4">
+                            <input asp-for="Producto.PorDescuento" id="PorcDescto" placeholder="Porcentaje de Descuento" onchange="javascript: validaNegativosyMayores100(event, 'PorcDescto')" type="number" class="form-control" />
+                            <span asp-validation-for="Producto.PorDescuento" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Producto.ImpuestoTarifa" class="col-form-label">Impuesto Tarifa:</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input asp-for="Producto.ImpuestoTarifa" id="ImpuestoTarifa" placeholder="Impuesto Tarifa" readonly type="number" class="form-control" />
+                            <span asp-validation-for="Producto.ImpuestoTarifa" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                                Exento
+                                <input type="checkbox" onclick="uncheckExonerado()" id="check1" asp-for="Producto.Exento" />
+                                <span class="check"></span>
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                                Modifica Precio
+                                <input type="checkbox" onclick="uncheck()" id="check2" asp-for="Producto.ModificaPrecio" />
+                                <span class="check"></span>
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                                Código Barras de Peso
+                                <input type="checkbox" onclick="javascript: checkPesoBarras()" id="chPeso" />
+                                <span class="check"></span>
+                            </label>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>
+<!--Modal Eliminar-->
+<div class="modal" id="Eliminar" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 1250px;">
+        <div class="modal-content">
+
+            <div class="modal-title">
+
+                <center><h2 class="modal-title">Búsqueda de Productos CABYS</h2></center>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-form-label">Seleccionado:</label>
+                    <div class="col-sm-2">
+                        <input id="codigobusqueda" readonly placeholder="Seleccionado" class="form-control" />
+
+                    </div>
+                    <div class="col-sm-10">
+
+                        <span id="textoCabys"></span>
+                    </div>
+
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-form-label">Descripción:</label>
+                    <div class="col-sm-8">
+                        <input id="CodProHaciendaBusqueda" placeholder="Descripcion del cabys" class="form-control" />
+
+                    </div>
+                    <div class="col-sm-2">
+                        <a class="fa fa-search" onclick="javascript: BuscarCabys();"></a>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive tableFixHead" style="padding:inherit; overflow:scroll;    z-index: 5; height: 300px;">
+                        <table class="table table-striped">
+                            <thead>
+
+
+                                <tr class="j-header">
+                                    <th><p style="width: 45px;">Asignar</p></th>
+                                    <th><p style="width: 95px;">Código</p></th>
+                                    <th><p style="width: 400px;">Descripción</p></th>
+                                    <th><p style="width: 60px;">Impuesto</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 1</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 2</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 3</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 4</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 5</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 6</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 7</p></th>
+                                    <th><p style="width: 400px;">Desc Categoría 8</p></th>
+
+                                </tr>
+
+
+
+                            </thead>
+                            <tbody id="bodyTable">
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <center>
+
+                    <button title="Cancelar" type="button" class="btn btnpage" style="border-radius:17px; width: 111px;" onclick="javascript: onClickCerrarModal()" ><a style="text-decoration:none; color:black;" data-dismiss="modal">Cancelar</a></button>
+                    &nbsp;
+                    <button title="Aceptar" type="button" class="btn btn btn-primary"   id="Guardar" style="border-radius: 20px;" onclick="javascript: onClickCerrarModal()">Aceptar</button>
+                </center>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+

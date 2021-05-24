@@ -1,0 +1,382 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Reportes.VentasXVendedorModel
+@{
+    ViewData["Title"] = "Reporte Ventas Vendedor";
+}
+
+@using System.Globalization;
+@using Microsoft.AspNetCore.Http
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security.Claims;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.Extensions.Configuration;
+@using Refit;
+@using Sicsoft.Checkin.Web.Models;
+
+
+
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Reportes</strong>
+    </li>
+}
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+
+    string[] Meses = new string[12];
+    Meses[0] = "Enero";
+    Meses[1] = "Febrero";
+    Meses[2] = "Marzo";
+    Meses[3] = "Abril";
+    Meses[4] = "Mayo";
+    Meses[5] = "Junio";
+    Meses[6] = "Julio";
+    Meses[7] = "Agosto";
+    Meses[8] = "Setiembre";
+    Meses[9] = "Octubre";
+    Meses[10] = "Noviembre";
+    Meses[11] = "Diciembre";
+}
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+
+            checkDetallado();
+
+        });
+
+        function reportePdf() {
+
+
+            var combo = document.getElementById("CodVend");
+
+            var item = "";
+            item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
+            item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
+            item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
+            item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Ventas Diarias</b></p>';
+            item += '<br>';
+
+
+
+
+
+
+            item += $("#noDetallado").html();
+
+            var opt = {
+                margin: [10, 3, 15, 3],
+                pagebreak: { avoid: 'tr' },
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { format: 'letter', orientation: 'portrait' }
+            };
+
+            console.log(opt);
+
+            html2pdf().set(opt)
+                .from(item)
+                .save("Reporte_de_Ventas_Vendedor.pdf");
+
+        }
+        function reporteDetallado() {
+
+        }
+        function Excel() {
+            // $("#tlbIndexDash1").tableExport();
+            var table = $("#noDetallado");
+            var html = table.html();
+            var htmls = "";
+            var uri = 'data:application/vnd.ms-Excel;base64,';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            };
+
+            var format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                })
+            };
+
+            htmls = html;
+
+            var ctx = {
+                worksheet: 'reporte',
+                table: htmls
+            }
+
+
+            var link = document.createElement("a");
+            link.download = "Reporte de Ventas por Vendedor.xls";
+            link.href = uri + base64(format(template, ctx));
+            link.click();
+        }
+
+    </script>
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+
+<div class="ibox">
+    <div class="ibox-content">
+        <form method="get">
+            <h2>Filtros:</h2>
+
+            <div>
+                <div class="row">
+
+
+
+
+                    <div class="col-sm-4">
+                        <select asp-for="filtro.Cod" id="CodCaja" class="form-control  mi-selector">
+                            <option value="NULL" selected>-Año-</option>
+                            @foreach (var item in Model.Historico.OrderByDescending(a => a))
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <select asp-for="filtro.FacturaInicial" id="CodCaja" class="form-control  mi-selector">
+                            <option value="NULL" selected>-Mes Inicial-</option>
+
+                            @for (int a = 0; a < Meses.Length; a++)
+                            {
+                                <option value="@(a+1)">@Meses[a]</option>
+                            }
+                            @*<option value="1" selected>Enero</option>
+                                <option value="2">Febrero</option>
+                                <option value="3">Marzo</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Mayo</option>
+                                <option value="6">Junio</option>
+                                <option value="7">Julio</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>*@
+
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <select asp-for="filtro.FacturaFinal" id="CodCaja" class="form-control  mi-selector">
+                            <option value="NULL" selected>-Mes Final-</option>
+                            @for (int a = 0; a < Meses.Length; a++)
+                            {
+                                <option value="@(a+1)">@Meses[a]</option>
+                            }
+                        </select>
+                    </div>
+
+
+
+                    <div class="col-sm-12">
+                        <br />
+                    </div>
+
+
+
+
+
+
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+                        <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>&nbsp;
+                        <a onclick="javascript: reportePdf()" title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        <a onclick="javascript: Excel()" title="Exportar a Excel" class="btn btnExcel">EXCEL</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="ibox">
+    <div class="ibox-content lista">
+
+
+
+        <div id="noDetallado">
+            @{
+                int i = 0;
+                var general = Model.EncVtas.ToList();
+            }
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <label style="font-weight: bold;" id="FechaInicial">Mes Inicial:</label>
+                    <br />
+                    <label style="font-weight: bold;" id="FechaFinal">Mes Final:</label>
+                    <br />
+
+
+
+                </div>
+                <div class="col-sm-6" style="text-align: left;">
+                    @if(Model.filtro.FacturaInicial > 0 && Model.filtro.FacturaFinal > 0)
+                    {
+
+                    <label>@Meses[Model.filtro.FacturaInicial - 1]</label>
+                    <br />
+                    <label> @Meses[Model.filtro.FacturaFinal - 1] </label>
+                    <br />
+                    }
+
+
+
+                </div>
+            </div>
+            <br />
+            <table style="border: none; width: 100%; height: 36px;" border="1">
+                <thead>
+                    <tr style="height: 18px;">
+
+                        <th align="center" style="width: 19%;">Vendedor</th>
+                        <th align="center" style="width: 6%;">Enero</th>
+                        <th align="center" style="width: 6%;">Febrero</th>
+
+                        <th align="center" style="width: 6%;">Marzo</th>
+
+                        <th align="center" style="width: 6%;">Abril</th>
+
+                        <th align="center" style="width: 6%;">Mayo</th>
+
+                        <th align="center" style="width: 6%;">Junio</th>
+
+                        <th align="center" style="width: 6%;">Julio</th>
+
+                        <th align="center" style="width: 6%;">Agosto</th>
+
+                        <th align="center" style="width: 6%;">Setiembre</th>
+
+                        <th align="center" style="width: 6%;">Octubre</th>
+
+                        <th align="center" style="width: 6%;">Noviembre</th>
+
+                        <th align="center" style="width: 6%;">Diciembre</th>
+                        <th align="center" style="width: 6%;">Total</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item2 in Model.EncVtas.GroupBy(a => a.CodVendedor).ToList())
+                    {
+
+                        <tr>
+
+                            <td align="left" style=" ">
+                                <p style="font-size:12px; font-weight: bold;"> @item2.FirstOrDefault().CodVendedor - @((Model.Vendedores.Where(a => a.CodVendedor == item2.FirstOrDefault().CodVendedor).FirstOrDefault() == null ? "": Model.Vendedores.Where(a => a.CodVendedor == item2.FirstOrDefault().CodVendedor).FirstOrDefault().NomVendedor))</p>
+                            </td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 1).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 1).Sum(a => a.Total),2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 2).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 2).Sum(a => a.Total),2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 3).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 3).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 4).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 4).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px; "> @(( item2.Where(a => a.Mes == 5).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 5).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 6).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 6).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 7).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 7).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 8).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 8).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 9).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 9).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 10).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 10).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px;  "> @(( item2.Where(a => a.Mes == 11).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 11).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=" "><p style="font-size:12px; "> @(( item2.Where(a => a.Mes == 12).FirstOrDefault() == null ? 0 : decimal.Round(item2.Where(a => a.Mes == 12).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                            <td align="right" style=""><p style="font-size:12px; font-weight: bold;">  @decimal.Round(item2.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
+
+
+
+
+
+                        </tr>
+
+
+
+                        i++;
+                    }
+
+
+
+
+
+                    <tr>
+
+                        <td align="center" style=" ">
+                            <p style="font-size:12px; font-weight: bold;"> Total  </p>
+                        </td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 1).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 1).Sum(a => a.Total),2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 2).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 2).Sum(a => a.Total),2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 3).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 3).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 4).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 4).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 5).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 5).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 6).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 6).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 7).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 7).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 8).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 8).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 9).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 9).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 10).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 10).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 11).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 11).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=" "><p style="font-size:12px; font-weight: bold;"> @(( Model.EncVtas.Where(a => a.Mes == 12).FirstOrDefault() == null ? 0 : decimal.Round(Model.EncVtas.Where(a => a.Mes == 12).Sum(a => a.Total), 2)).ToString("N", formato))</p></td>
+                        <td align="right" style=""><p style="font-size:12px; font-weight: bold;">  @decimal.Round(Model.EncVtas.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
+
+
+
+
+                    </tr>
+
+                </tbody>
+            </table>
+            <p>&nbsp;</p>
+
+            <hr style="border-color: black;" />
+
+            <div class="cuidado"></div>
+            <div class="html2pdf__page-break"></div>
+
+
+
+
+        </div>
+
+    </div>
+</div>

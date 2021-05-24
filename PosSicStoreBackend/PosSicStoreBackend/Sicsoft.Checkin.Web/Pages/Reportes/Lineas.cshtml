@@ -1,0 +1,193 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Reportes.LineasModel
+@{
+    ViewData["Title"] = "Reporte Líneas";
+}
+@using System.Globalization;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Reportes</strong>
+    </li>
+}
+
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+
+      
+
+        });
+         
+        function reportePdf() {
+            var item = "";
+            item += '<p style="text-align: left; padding-left: 120px;"><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
+            item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
+            item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") +'</h3>';
+            item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de L&iacute;neas de Inventario</b></p>';
+            item += '<br>';
+    
+            item += $(".table-responsive").html();
+            var opt = {
+                margin: [10, 0, 15, 0],
+
+                pagebreak: { avoid: 'tr' },
+                html2canvas: { scale: 2 },
+                jsPDF: { format: 'letter', orientation: 'portrait' }
+            };
+
+
+
+            html2pdf().set(opt)
+                .from(item)
+                .save("Reporte_de_Lineas.pdf");
+
+        }
+
+        function Excel() {
+            // $("#tlbIndexDash1").tableExport();
+            var table = $(".table-responsive");
+            var html = table.html();
+            var htmls = "";
+            var uri = 'data:application/vnd.ms-Excel;base64,';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            };
+
+            var format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                })
+            };
+
+            htmls = html;
+
+            var ctx = {
+                worksheet: 'reporte',
+                table: htmls
+            }
+
+
+            var link = document.createElement("a");
+            link.download = "reporte de líneas.xls";
+            link.href = uri + base64(format(template, ctx));
+            link.click();
+        }
+    </script>
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+<div class="ibox">
+    <div class="ibox-content">
+        <form method="get">
+            <h2>Filtros:</h2>
+
+            <div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="m-b-lg">
+                            <form method="get">
+                                <div class="form-row">
+                                    <div class="input-group input-group-sm  col-md-12">
+                                        <input asp-for="filtro.Texto" class="form-control" placeholder="Buscar Lineas">
+                                        <span class="input-group-append">
+                                            <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+
+
+                            <div class="">
+
+
+
+                                <p style="font-size:14px;">Se encontraron @Model.Lineas.Length registros de líneas.</p>
+
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-3">
+
+                        <a onclick="javascript: reportePdf()" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        <a onclick="javascript: Excel()" class="btn btnExcel">EXCEL</a>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="ibox ">
+
+
+    <div class="ibox-content lista">
+        <br />
+    
+        
+        <div class="table-responsive" style="padding:inherit;">
+            <table class="table dataTables-example" style="width: 65%; margin-left: 15%;">
+                <thead>
+                    <tr>
+
+                        <td align="center" style="width: 25%;"><h3>Código Línea</h3></td>
+                        <td align="center" style="width: 50%;"><h3>Nombre de Línea</h3></td>
+
+
+                        
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Lineas)
+                    {
+                        <tr>
+
+                            <td align="center" style="">
+                                <p style="font-size:15px;"> @item.CodLinea</p>
+                            </td>
+                     
+                            <td align="left" style=""><p style="font-size:15px;">  @item.NomLinea </p></td>
+
+                            
+
+                        </tr>
+
+                    }
+                <tr>
+                    <td align="center" style="padding-top: 15px;">
+                        <p style="font-size: 15px; font-weight: 600;">Total Líneas</p>
+                    </td>
+                    <td align="center" style=""><p style="font-size:15px;">  @Model.Lineas.Count() </p></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        
+    </div>
+</div>

@@ -1,0 +1,696 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.MovimientoInventarios.NuevoModel
+@{
+    ViewData["Title"] = "Movimiento Inventarios";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a>Movimientos de Inventario</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Inclusión </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+        /* .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }*/
+        td {
+            border-bottom-style: solid !important;
+            border-bottom-width: 1px !important;
+            border-bottom-color: #dec2e6 !important;
+        }
+
+        h3 {
+            font-size: 13px !important;
+        }
+
+        th {
+            background-color: transparent !important;
+        }
+
+        td p {
+            font-weight: 300 !important;
+        }
+
+ 
+        
+    </style>
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+    $(document).ready(function () {
+        jQuery(document).ready(function ($) {
+            $(document).ready(function () {
+                $('.mi-selector').select2();
+            });
+        });
+        $(".js-example-responsive").select2({
+            width: 'resolve',// need to override the changed default
+            height: 'resolve'
+        });
+
+    });
+        var Eliminar = [];
+        var ProdCadena = [];
+        var bandera = false;
+        var idP = 0;
+    function onChangeProducto() {
+        console.log("Producto: " + $("#CodPro").val());
+
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Nuevo", "Producto")',
+            data: { id: $("#CodPro").val() },
+            success: function (result) {
+
+                console.log(result);
+
+                if (result.codPro != "") {
+
+                    $("#Nombre").val(result.nomPro);
+                    $("#PrecioVenta").text(formatoDecimal(result.precioVenta.toFixed(2)));
+                    $("#Costo").val(result.costoPro);
+                    $("#UnidadMedida").text(result.uniMed);
+                    $("#Cantidad").val(1);
+                }
+
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+
+        }
+        var total = 0;
+        var cantidad = 0;
+        function InsertarProductoTabla() {
+            if (!bandera) {
+
+                if ($("#Nombre").val() != "") {
+
+
+                    var detalle = {
+                        codPro: $("#CodPro").val(),
+                        NomPro: $("#Nombre").val(),
+                        PreVta: $("#Costo").val(),
+                        cantidad: $("#Cantidad").val()
+                    };
+                    ProdCadena.push(detalle);
+
+                    cantidad += parseInt(detalle.cantidad);
+                    total += parseFloat(detalle.PreVta) * parseInt(detalle.cantidad);
+
+                    $("#Nombre").val("");
+                    $("#PrecioVenta").text("");
+                    $("#Costo").val("");
+                    $("#UnidadMedida").text("");
+                    $("#Cantidad").val("");
+
+                    $("#cantidad").text(cantidad);
+                    $("#total").text(formatoDecimal(total.toFixed(2)));
+                    RellenaTabla();
+                }
+            } else {
+                console.log(ProdCadena[idP]);
+                var detalle = {
+                    codPro: $("#CodPro").val(),
+                    NomPro: $("#Nombre").val(),
+                    PreVta: $("#Costo").val(),
+                    cantidad: $("#Cantidad").val()
+                };
+
+                if (ProdCadena[idP] != undefined) {
+
+                    if (ProdCadena[idP].codPro == detalle.codPro) {
+
+                        total -= parseFloat(ProdCadena[idP].PreVta) * parseInt(ProdCadena[idP].cantidad);
+                        cantidad -= parseFloat(ProdCadena[idP].cantidad);
+                    }
+
+                    
+                }
+              
+                if (ProdCadena[idP] != undefined) {
+                    if (ProdCadena[idP].codPro != detalle.codPro) {
+                        ProdCadena.push(detalle);
+                    } else {
+                        ProdCadena[idP] = detalle;
+                    }
+                } else {
+                    ProdCadena[idP] = detalle;
+                }
+                
+                cantidad += parseInt(detalle.cantidad);
+                total += parseFloat(detalle.PreVta) * parseInt(detalle.cantidad);
+                $("#Nombre").val("");
+                $("#PrecioVenta").text("");
+                $("#Costo").val("");
+                $("#UnidadMedida").text("");
+                $("#Cantidad").val("");
+
+                $("#cantidad").text(cantidad);
+                $("#total").text(formatoDecimal(total.toFixed(2)));
+                ids = 0;
+                bandera = false;
+                RellenaTabla();
+            }
+        }
+        const formatter = new Intl.NumberFormat('es-CR', {
+            style: 'currency',
+            currency: 'CRC',
+            minimumFractionDigits: 0
+        })
+        function RellenaTabla() {
+            var sOptions = '';
+
+            $("#tbody").html('');
+
+            for (var i = 0; i < ProdCadena.length; i++) {
+                sOptions += '<tr>'
+                sOptions += '<td align="center" style="padding-top:13px;"> <input style="margin-left: -1%; position: inherit !important;" id="check' + i +'" class="form-check-input" type="checkbox" onclick = "javascript: AgruparNumeros('+i+')" /> ';
+                sOptions += '<td align="center" style="padding-top:13px;">  <p style="font-size:13px;">' + ProdCadena[i].cantidad + '</p></td>';
+                sOptions += '<td align="center" style="padding-top:13px;">  <a style="font-size:13px; text-decoration: underline; color: blue;" onclick="javascript: escogeCodigo('+i+')">' + ProdCadena[i].codPro + '</a></td>';
+                sOptions += '<td align="left" style="padding-top:13px;">  <p style="font-size:13px;">' + ProdCadena[i].NomPro + '</p></td>';
+                sOptions += '<td align="right" style="padding-top:13px;">  <p style="font-size:13px;">' + formatoDecimal(ProdCadena[i].PreVta) + '</p></td>';
+
+
+
+                sOptions += '</tr>'
+            }
+            $("#tbody").html(  sOptions  );
+        }
+
+
+        function escogeCodigo(i) {
+            $("#CodPro").val(ProdCadena[i].codPro).trigger('change');
+             $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Nuevo", "Producto")',
+            data: { id: ProdCadena[i].codPro },
+            success: function (result) {
+
+                console.log(result);
+
+                if (result.codPro != "") {
+
+                    $("#Nombre").val(result.nomPro);
+                    $("#PrecioVenta").text(result.precioVenta.toFixed(2));
+                    $("#Costo").val(ProdCadena[i].PreVta);
+                    $("#UnidadMedida").text(result.uniMed);
+                    $("#Cantidad").val(ProdCadena[i].cantidad);
+                    bandera = true;
+                    idP = i;
+                    //EliminaProducto(i);
+                }
+
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+
+        function AgruparNumeros(i) {
+            var checkbox1 = document.getElementById("check" + i);
+            
+            if (checkbox1.checked) {
+                console.log("insersion " + i);
+
+                Eliminar.push(ProdCadena[i]);
+            } else {
+                console.log("eliminar " + i);
+                Eliminar.splice(ProdCadena.indexOf(ProdCadena[i]), 1);
+            }
+            
+        }
+
+
+        function EliminaProducto() {
+
+            Swal.fire({
+                title: '¿Desea eliminar estos productos?',
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: `Aceptar`,
+
+                denyButtonText: `Cancelar`,
+                customClass: {
+                    confirmButton: 'swalBtnColor',
+                    denyButton: 'swalDeny'
+                },
+            }).then((result) => {
+
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                    for (var i = 0; i < Eliminar.length; i++) {
+
+                        var a = ProdCadena.indexOf(Eliminar[i]);
+                        if (a >= 0) {
+
+                        total -= parseFloat(ProdCadena[a].PreVta) * parseInt(ProdCadena[a].cantidad);
+                        cantidad -= parseFloat(ProdCadena[a].cantidad);
+                        $("#cantidad").text(cantidad);
+                        $("#total").text(formatoDecimal(total.toFixed(2)));
+                        ProdCadena.splice(a, 1);
+                        
+
+                        RellenaTabla();
+                        }
+                    }
+                    Eliminar = [];
+
+                }
+            })
+
+
+        }
+
+
+        function LimpiarDatos() {
+            $("#Nombre").val("");
+            $("#PrecioVenta").text("");
+            $("#Costo").val("");
+            $("#UnidadMedida").text("");
+            $("#Cantidad").val("");
+
+        }
+
+        function cerrarModalError() {
+            $("#Error").hide();
+            if ($('.modal-backdrop').is(':visible')) {
+
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').hide();
+            }
+        }
+        function Generar() {
+            var encMovInv =
+            {
+               // NumDocto: $("#NoDoc").val(),
+                CodMov: $("#TipoMov").val(),
+                Detalle: $("#Detalle").val(),
+                FecDocto: $("#Fecha").val(),
+                TotalMov: 0,
+                CodProveedor: $("#Proveedor").val()
+            };
+
+            var productos = ProdCadena;
+
+            var recibido = {
+                encMovInv,
+                productos
+            }
+            var enviar = {
+                encMovInv,
+                productos
+            }
+
+            if (validar(encMovInv)) {
+                var recibidos = JSON.stringify(recibido);
+                console.log(JSON.stringify(enviar));
+               $.ajax({
+                    type: 'POST',
+
+                    url: '@Url.Page("Nuevo", "Generar")',
+                    dataType: 'text',
+                    data: { recibidos: recibidos.toString()},
+                        headers: {
+                            RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+                        },
+                    success: function (json) {
+
+                        $("#divProcesando").hide();
+
+                        if ($('.modal-backdrop').is(':visible')) {
+
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').hide();
+                        }
+                        console.log("resultado " + typeof(json));
+                        if (json == "true") {
+                            Swal.fire({
+                                title: "Ha sido guardado con éxito",
+
+                                icon: 'success',
+                                showCancelButton: false,
+
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'swalBtnColor',
+
+                                },
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            })
+
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Ha ocurrido un error al intentar guardar'
+
+                            })
+                        }
+                    },
+
+                    beforeSend: function (xhr) {
+
+                        $("#divProcesando").modal("show");
+                    },
+                    complete: function () {
+
+                    },
+                    error: function (error) {
+
+                    }
+                    });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Pareciera que aún falta un campo por llenar'
+
+                })
+            }
+        }
+
+        function validar(enc) {
+            console.log(enc);
+            if (enc.CodMov == 0 || enc.CodMov == null) {
+
+                return false;
+            } else if (enc.Detalle == "" || enc.Detalle == null) {
+                return false;
+            } else if (enc.FecDocto == "" || enc.FecDocto == null) {
+                return false;
+            } else if (ProdCadena.length == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+    </script>
+
+}
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox ">
+
+            <div class="ibox-content">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <label asp-for="Objeto.EncMovInv.CodMov" class="col-form-label">Tipo Movimiento:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <select asp-for="Objeto.EncMovInv.CodMov" id="TipoMov" class="form-control  mi-selector">
+                                    @*<option value="00" selected>-Seleccione-</option>*@
+                                    @foreach (var item in Model.Tipos)
+                                    {
+                                        <option value="@item.CodMov">@item.CodMov - @item.NomMov</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Objeto.EncMovInv.CodMov" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        @*<label asp-for="Objeto.HistoInv[0].CodProveedor" class="col-form-label">Proveedor:</label>*@
+
+
+
+                    </div>
+                    <input hidden asp-for="Objeto.EncMovInv.NumDocto" id="NoDoc" class="form-control">
+
+
+                    <div class="col-sm-6">
+                        <label asp-for="Objeto.EncMovInv.FecDocto" class="col-form-label">Fecha:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input type="date" asp-for="Objeto.EncMovInv.FecDocto" id="Fecha" class="form-control">
+                                <span asp-validation-for="Objeto.EncMovInv.FecDocto" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label asp-for="Objeto.EncMovInv.Detalle" class="col-form-label">Detalle:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input asp-for="Objeto.EncMovInv.Detalle" id="Detalle" class="form-control">
+                                <span asp-validation-for="Objeto.EncMovInv.Detalle" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ibox">
+
+            <div class="ibox-content">
+                <br />
+                <div class="row">
+
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+
+                                <label class="col-form-label">Producto:</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <select id="CodPro" onchange="javascript: onChangeProducto(); " class="form-control  mi-selector">
+                                    <option value="00" selected>-Seleccione-</option>
+                                    @foreach (var item in Model.Productos)
+                                    {
+                                        <option value="@item.CodPro">@item.CodPro - @item.NomPro</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-sm-6">
+
+
+                        <input id="Nombre" hidden readonly type="text" class="form-control">
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <label class="col-form-label">Precio Venta:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <label id="PrecioVenta" style="line-height: 32px;">
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-4">
+                                <label class="col-form-label">Cantidad:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <input id="Cantidad" min="1"  type="number" class="form-control numero"   onchange="javascript: revisarNumero(event, 'Cantidad');" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==9) return false;" onpaste="return false;" onDrop="return false;">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <label class="col-form-label">Unid. Medida:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <label id="UnidadMedida" style="line-height: 32px;">
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-4">
+                                <label class="col-form-label">Costo:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <input id="Costo" type="number" min="1" onchange="javascript: revisarNumero(event, 'Costo');" pattern="^[0-9]+" class="form-control numero" onpaste="return false;" onDrop="return false;">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-sm-12" style="text-align: center;">
+                <a title="Eliminar" onclick="javascript: LimpiarDatos();" style="width: 25%;" class="btn btnpage">Cancelar</a>&nbsp;
+                <a title="Agregar" id="Agregar" onclick="javascript: InsertarProductoTabla();" style="background-color: #A5CC9C; border-color: #A5CC9C; color: #fff; width: 25%;" class="btn btn-primary">Guardar</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="ibox">
+
+            <div class="ibox-content" style="background-color: #fff;">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive tableFixHead" style="padding:inherit; overflow-y:scroll;    z-index: 5; height: 280px;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+
+                                        <th align="center" style="width: 10%; text-align: center;"><img src="~/img/Botones/equis.png" onclick="javascript: EliminaProducto();" style="height: 20px; width: 20px; margin-top: 3px;" /></th>
+                                        <th align="center" style="width: 1%; text-align: center;"><h3>Cantidad</h3></th>
+                                        <th align="center" style="width: 10%; text-align: center;"><h3>Código</h3></th>
+                                        <th align="center" style="width: 50%; text-align: center;"><h3>Nombre </h3></th>
+                                        <th align="center" style="width: 14%; text-align: center;"><h3>Costo</h3></th>
+
+
+                                    </tr>
+
+                                </thead>
+                                <tbody id="tbody">
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="row">
+                    <div class="col-sm-6">
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+                        <div class="row">
+
+                            <div class="col-sm-12">
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-family: 'Poppins' !important; font-weight: 500 !important; font-style: normal;"> Cantidad Artículos:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="cantidad" style="display: inline-table; font-family: 'Poppins' !important; font-weight: bold !important; font-style: normal;">0</label>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-family: 'Poppins' !important; font-weight: 500 !important; font-style: normal;"> Total:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="total" style="display: inline-table; font-family: 'Poppins' !important; font-weight: bold !important; font-style: normal;">0</label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button onclick="javascript: Generar();" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!--Modal Error CAntidad-->
+<div class="modal" id="Error" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2>Error</h2>
+            </div>
+
+            <div class="modal-body">
+                <h3 style="color: #FF0000">Ha ocurrido un error al intentar guardar</h3>
+            </div>
+
+            <div class="modal-footer">
+                <center>
+                    <button type="button" class="btn btn btn-primary" id="Guardar" style="border-radius: 20px;" onclick="javascript: cerrarModalError()">Aceptar</button>
+                </center>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ 

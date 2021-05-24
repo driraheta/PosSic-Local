@@ -1,0 +1,164 @@
+﻿
+@{
+    ViewBag.Title = "Equipamentos";
+    var CssVersion = System.Configuration.ConfigurationManager.AppSettings["CssVersion"];
+    var JsVersion = System.Configuration.ConfigurationManager.AppSettings["JsVersion"];
+}
+<script type="text/javascript" src="~/Scripts/Views/Equipamentos/Index.js?@JsVersion"></script>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Equipamento</h2>
+        <ol class="breadcrumb">
+            <li class="breadcum-item">
+                <a href="~/Home/Index">Home</a>
+            </li>
+            <li class="breadcum-item">
+                <a href="#">Equipamento</a>
+            </li>
+            <li class="breadcum-item active">
+                <strong>Inicio</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2"></div>
+</div>
+<br />
+<div class="col-lg-12">
+    <div class="ibox">
+        <div class="ibox-title" style="text-align: right">
+            <button onclick="javascript: NuevoEquipamento();" type="button" class="btn btn-w-m btn-primary">Nuevo</button>
+        </div>
+        <div class="ibox-content">
+            <form>
+                <div class="form-group row">
+                    <div class="col-sm-2">
+                        <label class="control-label">Descripción:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input id="idSearchText" name="idSearchText" type="text" placeholder="Descripción" class="form-control" />
+                    </div>
+                    <div class="col-sm-4">
+                        <button class="btn btn-primary btn-circle" data-toggle="toggle" title="Buscar equipamentos por descripción" type="button" onclick="javascript: ObtieneEquipamentos();">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12" style="height: 500px; overflow-y: auto;">
+                        <table class="table table-striped" id="tlbIndiceEquipamento">
+                            <thead>
+                                <tr>
+                                    <th style="width: 2%"></th>
+                                    <th style="width: 15%">Código Equipamento</th>
+                                    <th>Nombre Equipamento</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* DETALLAR EQUIPAMENTOS *@
+<div class="modal inmodal" id="divDetailsEquipamento" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Equipamentos</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Código Equipamento:</label>
+                            <div class="col-sm-9">
+                                <div class="input-group m-b">
+                                    <span class="input-group-addon"><label class="glyphicon glyphicon glyphicon-font"></label></span>
+                                    <input id="IdCodigo" name="IdCodigo" disabled class="form-control" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nombre Equipamento:</label>
+                            <div class="col-sm-9">
+                                <div class="input-group m-b">
+                                    <span class="input-group-addon"><label class="glyphicon glyphicon glyphicon-font"></label></span>
+                                    <textarea id="IdDescripcion" name="IdDescripcion" disabled class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* EDITAR EQUIPAMENTOS *@
+<div class="modal inmodal" id="divEditEquipamento" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Actualiza Equipamento</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Código:</label>
+                            <div class="col-sm-10">
+                                <input id="IdCodigo_Edt" name="IdCodigo_Edt" disabled class="form-control" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Nombre:</label>
+                            <div class="col-sm-10">
+                                <textarea id="IdDescripcion_Edt" name="IdDescripcion_Edt" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-12" style="text-align: right">
+                            <button type="button" class="btn btn-primary" onclick="javascript: ActualizaEquipamento();"><i class="fa fa-upload">&nbsp;Actualizar</i></button>
+                            <button type="button" class="btn btn-white" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ELIMINAR EQUIPAMENTOS *@
+<div class="modal inmodal" id="divEliminaEquipamento" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Eliminar Equipamento</h4>
+            </div>
+            <div class="modal-body">
+                <p>¿Deseas eliminar el equipamento seleccionada?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="javascript: ConfirmaEliminaEquipamento();">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>

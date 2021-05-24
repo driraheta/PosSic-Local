@@ -1,0 +1,141 @@
+﻿@page "{id}"
+@model Sicsoft.Checkin.Web.Pages.TiposMovimientos.EditarModel
+@{
+    ViewData["Title"] = "Tipos Movimientos";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a asp-page="./Index">Tipos Movimientos</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Editar </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+        $(document).ready(function () {
+            uncheck();
+        });
+        function uncheck() {
+            var checkbox1 = document.getElementById("check1");
+            var checkbox2 = document.getElementById("check2");
+
+            checkbox1.onclick = function () {
+                if (checkbox1.checked != false) {
+                    checkbox2.checked = null;
+
+                }
+            }
+            checkbox2.onclick = function () {
+                if (checkbox2.checked != false) {
+                    checkbox1.checked = null;
+
+                }
+            }
+
+
+        }
+    </script>
+}
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox ">
+        <div class="ibox-title">
+            <h2>Información Tipo de Movimiento</h2>
+
+        </div>
+        <div class="ibox-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Tipo.CodMov" class="col-form-label">Código:</label>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Tipo.CodMov" readonly class="form-control">
+                            <span asp-validation-for="Tipo.CodMov" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Tipo.NomMov" class="col-form-label">Nombre:</label>
+
+                        </div>
+                        <div class="col-sm-8">
+
+
+                            <input asp-for="Tipo.NomMov" class="form-control" />
+                            <span asp-validation-for="Tipo.NomMov" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Tipo.NumDoctoSig" class="col-form-label">Docto. Siguiente :</label>
+
+                        </div>
+                        <div class="col-sm-8">
+
+
+                            <input asp-for="Tipo.NumDoctoSig" id="NumDoctoSig" onchange="javascript: validaNegativos(event,'NumDoctoSig')" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==9) return false;" class="form-control" />
+                            <span asp-validation-for="Tipo.NumDoctoSig" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Tipo.Conversion" class="col-form-label">Tipo Movimiento :</label>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                                Entrada
+                                <input type="checkbox" onclick="uncheck()" id="check1" asp-for="Tipo.Entrada" />
+                                <span class="check"></span>
+                            </label>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                                Salida
+                                <input type="checkbox" onclick="uncheck()" id="check2" asp-for="Tipo.Salida" />
+                                <span class="check"></span>
+                            </label>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

@@ -1,0 +1,319 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Clientes.NuevoModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a asp-page="./Index">Clientes</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Agregar </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+
+        });
+
+
+        function BuscarCedula() {
+             $.ajax({
+                        type: 'GET',
+                        dataType: 'json',
+                        url: '@Url.Page("Nuevo", "Cedula")',
+                 data: { id: $("#Cedula").val() },
+                         success: function (result) {
+                             $("#divProcesando").modal("hide");
+
+                             console.log(result);
+
+                             $("#NomCliente").val(result.nombre + " " + result.apellidos);
+                             $("#tipo").val("0" + result.tipo);
+
+                         },
+                         beforeSend: function () {
+                             $("#divProcesando").modal("show");
+                 },
+                 error: function (xhr) {
+                     console.log(xhr);
+                     $("#divProcesando").modal("hide");
+                 }
+                     })
+        }
+
+    </script>
+    <script>
+
+        Array.prototype.forEach.call(document.body.querySelectorAll("*[data-mask]"), applyDataMask);
+        console.log(document.body.querySelectorAll("*[data-mask]"));
+        function applyDataMask(field) {
+            var mask = field.dataset.mask.split('');
+
+            // For now, this just strips everything that's not a number
+            function stripMask(maskedData) {
+                function isDigit(char) {
+                    return /\d/.test(char);
+                }
+                return maskedData.split('').filter(isDigit);
+            }
+
+            // Replace `_` characters with characters from `data`
+            function applyMask(data) {
+                return mask.map(function (char) {
+                    if (char != '_') return char;
+                    if (data.length == 0) return char;
+                    return data.shift();
+                }).join('')
+            }
+
+            function reapplyMask(data) {
+                return applyMask(stripMask(data));
+            }
+
+            function changed() {
+                var oldStart = field.selectionStart;
+                var oldEnd = field.selectionEnd;
+
+                field.value = reapplyMask(field.value);
+
+                field.selectionStart = oldStart;
+                field.selectionEnd = oldEnd;
+            }
+
+            field.addEventListener('click', changed)
+            field.addEventListener('keyup', changed)
+        }
+    </script>
+}
+
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox ">
+        <div class="ibox-title">
+
+            <h2>Información Cliente</h2>
+
+        </div>
+        <div class="ibox-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Cliente.CodCliente" class="col-form-label">Código de Cliente:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Cliente.CodCliente" placeholder="Codigo del cliente" class="form-control">
+                            <span asp-validation-for="Cliente.CodCliente" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Cliente.NomCliente" class="col-form-label">Nombre Cliente:</label>
+
+                        </div>
+                        <div class="col-sm-8">
+
+
+                            <input asp-for="Cliente.NomCliente" id="NomCliente" placeholder="Nombre del Cliente" class="form-control" />
+                            <span asp-validation-for="Cliente.NomCliente" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <label asp-for="Cliente.Direccion" class="col-form-label">Dirección:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+
+
+                            <textarea asp-for="Cliente.Direccion" rows="5" placeholder="Dirección del Cliente" class="form-control"></textarea>
+                            <span asp-validation-for="Cliente.Direccion" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Cliente.CodPrecio" class="col-form-label">Tipo de Precio:</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select asp-for="Cliente.CodPrecio" class="form-control">
+                                <option value="00" selected>-Ninguno-</option>
+                                @foreach (var item in Model.TiposPrecios)
+                                {
+                                    <option value="@item.CodPrecio">@item.NomLista</option>
+                                }
+
+                            </select>
+                            <span asp-validation-for="Cliente.TipoCedula" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Cliente.TipoCedula" class="col-form-label">Tipo de Cédula:</label>
+                    <div class="form-group row">
+
+
+
+                        <div class="col-sm-4">
+                            <select asp-for="Cliente.TipoCedula" id="tipo" class="form-control">
+                                <option value="00" selected>-Ninguno-</option>
+                                <option value="01">Física</option>
+                                <option value="02">Jurídica</option>
+                                <option value="03">Dimex</option>
+                                <option value="04">NITE</option>
+
+                            </select>
+                            <span asp-validation-for="Cliente.TipoCedula" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-8">
+                            <input asp-for="Cliente.Cedula" type="number" id="Cedula" onchange="javascript: BuscarCedula(); " placeholder="Identificación del Cliente"  pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==12) return false;" class="form-control">
+                            <span asp-validation-for="Cliente.Cedula" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+
+                            <label asp-for="Cliente.Email" class="col-form-label">Email del Cliente:</label>
+                        </div>
+                        <div class="col-sm-8">
+
+
+                            <input asp-for="Cliente.Email" type="email" placeholder="Email del Cliente" class="form-control" />
+                            <span asp-validation-for="Cliente.Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+
+                            <label asp-for="Cliente.FecCumpleanos" class="col-form-label">Fecha de Cumpleaños (dd/MM):</label>
+                        </div>
+                        <div class="col-sm-4">
+
+
+                            <input asp-for="Cliente.FecCumpleanos" type="text" data-mask="__/__"  class="form-control" />
+                            <span asp-validation-for="Cliente.FecCumpleanos" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+
+                                    <label asp-for="Cliente.Telefono" class="col-form-label">Teléfono:</label>
+                                </div>
+                                <div class="col-sm-8">
+
+
+                                    <input asp-for="Cliente.Telefono" type="text" data-mask="____-____" placeholder="Número de Teléfono" class="form-control" />
+                                    <span asp-validation-for="Cliente.Telefono" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <label asp-for="Cliente.Celular" class="col-form-label">Celular:</label>
+
+                                </div>
+                                <div class="col-sm-8">
+
+
+                                    <input asp-for="Cliente.Celular" type="text" data-mask="____-____" placeholder="Número de Celular" class="form-control" />
+                                    <span asp-validation-for="Cliente.Celular" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+
+                                    <label asp-for="Cliente.DiasCredito" class="col-form-label">Días Crédito:</label>
+                                </div>
+                                <div class="col-sm-8">
+
+
+                                    <input asp-for="Cliente.DiasCredito" id="DCredito" onchange="javascript: validaNegativos(event,'DCredito')" required placeholder="Días Crédito" class="form-control" />
+                                    <span asp-validation-for="Cliente.DiasCredito" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+
+                                    <label asp-for="Cliente.LimiteCredito" class="col-form-label">Límite de Crédito:</label>
+                                </div>
+                                <div class="col-sm-8">
+
+
+                                    <input asp-for="Cliente.LimiteCredito" id="LCredito" onchange="javascript: validaNegativos(event,'LCredito')" placeholder="Límite de Crédito" class="form-control" />
+                                    <span asp-validation-for="Cliente.LimiteCredito" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

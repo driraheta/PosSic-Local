@@ -1,0 +1,562 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Reportes.CierreCajaModel
+@{
+    ViewData["Title"] = "Cierre Caja";
+}
+@using System.Globalization;
+@using Microsoft.AspNetCore.Http
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security.Claims;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.Extensions.Configuration;
+@using Refit;
+@using Sicsoft.Checkin.Web.Models;
+
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Reportes</strong>
+    </li>
+}
+
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+ 
+}
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+
+            checkDetallado();
+
+        });
+
+        function reportePdf() {
+            var checkbox1 = document.getElementById("cierreTarjetas");
+
+            var combo = document.getElementById("CodVend");
+
+            var item = "";
+            item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
+            item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
+            item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
+            item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Ventas Diarias</b></p>';
+            item += '<br>';
+
+
+            if (checkbox1.checked) {
+                item += $("#Detallado").html();
+                var opt = {
+                    margin: [10, 5, 15, 5],
+                    pagebreak: { before: '.cuidado' },
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { format: 'letter', orientation: 'portrait' }
+                };
+
+                console.log(opt);
+
+                html2pdf().set(opt)
+                    .from(item)
+                    .save("Reporte_de_CierreTarjetas.pdf");
+            } else {
+
+                item += $("#noDetallado").html();
+                var opt = {
+                    margin: [10, 5, 15, 5],
+                    pagebreak: { avoid: 'tr' },
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { format: 'letter', orientation: 'portrait' }
+                };
+
+                console.log(opt);
+
+                html2pdf().set(opt)
+                    .from(item)
+                    .save("Reporte_de_CierreCajas.pdf");
+            }
+
+
+
+               
+
+        }
+        function reporteDetallado() {
+
+        }
+        function Excel() {
+            // $("#tlbIndexDash1").tableExport();
+            var table = $("#noDetallado");
+            var html = table.html();
+            var htmls = "";
+            var uri = 'data:application/vnd.ms-Excel;base64,';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            };
+
+            var format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                })
+            };
+
+            htmls = html;
+
+            var ctx = {
+                worksheet: 'reporte',
+                table: htmls
+            }
+
+
+            var link = document.createElement("a");
+            link.download = "Reporte de Cierre de Caja.xls";
+            link.href = uri + base64(format(template, ctx));
+            link.click();
+        }
+        function checkDetallado() {
+            console.log("ingreso");
+            var checkbox1 = document.getElementById("cierreTarjetas");
+            var checkbox2 = document.getElementById("cierreCaja");
+            if (checkbox1.checked) {
+                checkbox2.checked = false;
+                checkbox1.checked = true;
+                $("#noDetallado").hide();
+                $("#Detallado").show();
+            } else {
+                checkbox2.checked = true;
+                checkbox1.checked = false;
+                $("#noDetallado").show();
+                $("#Detallado").hide();
+            }
+        }
+    </script>
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+
+<div class="ibox">
+    <div class="ibox-content">
+        <form method="get">
+            <h2>Filtros:</h2>
+
+            <div>
+                <div class="row">
+
+
+
+
+                    <div class="col-sm-4">
+                        <input class="form-control" id="FecInicial" type="date" asp-for="filtro.FechaInicial" />
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                            Cierre Caja
+                            <input type="checkbox" id="cierreCaja" onchange="javascript: checkDetallado();" />
+                            <span class="check"></span>
+                        </label>
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                            Cierre Tarjetas
+                            <input type="checkbox" id="cierreTarjetas" onchange="javascript: checkDetallado();" />
+                            <span class="check"></span>
+                        </label>
+                    </div>
+
+
+
+                    <div class="col-sm-12">
+                        <br />
+                    </div>
+
+
+
+
+
+
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+                        <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>&nbsp;
+                        <a onclick="javascript: reportePdf()" title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        <a onclick="javascript: Excel()" title="Exportar a Excel" class="btn btnExcel">EXCEL</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="ibox">
+    <div class="ibox-content lista">
+
+
+
+        <div id="noDetallado">
+            @{
+                int i = 0;
+                var general = Model.EncVtas.ToList();
+            }
+            @foreach (var item in Model.EncVtas)
+            {
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label style="font-weight: bold;" id="FechaInicial">Número de Cierre:</label>
+                        <br />
+                        <label style="font-weight: bold;" id="FechaInicial">Fecha:</label>
+                        <br />
+                        <label style="font-weight: bold;" id="FechaInicial">Caja:</label>
+                        <br />
+                        <label style="font-weight: bold;" id="FechaInicial">Cajero:</label>
+                        <br />
+
+
+                    </div>
+                    <div class="col-sm-6" style="text-align: left;">
+                        <label> @item.NumCierre</label>
+                        <br />
+
+                        <label> @item.Fecha.ToString("dd/MM/yyyy")</label>
+                        <br />
+                        <label> @item.CodCaja</label>
+                        <br />
+                        <label> @item.CodCajero - @((Model.Cajeros.Where(a => a.CodCajero == item.CodCajero).FirstOrDefault() == null ? "": Model.Cajeros.Where(a => a.CodCajero == item.CodCajero).FirstOrDefault().NomCajero))</label>
+                        <br />
+
+
+                    </div>
+                </div>
+                <br />
+                <div class="row" style="justify-content: left;">
+                    <h2 style="margin-left: 30%;">Datos del Cierre</h2>
+
+                </div>
+                <div class="row" style="justify-content: center;">
+                    <table style="border: none; width: 40%; height: 36px;" border="0">
+                        <tbody>
+                            <tr>
+                                <td align="left" style=""><b> Venta Neta:</b></td>
+                                <td align="right"><b>@decimal.Round(item.VentaNeta, 2).ToString("N", formato)</b></td>
+                            </tr>
+                            <tr>
+                                <td align="left" style=""><b>Impuesto Venta:</b></td>
+                                <td align="right"><b>@decimal.Round(item.ImpuestoVenta, 2).ToString("N", formato)</b></td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style=""><b>Venta Bruta:</b></td>
+                                <td align="right"><b>@decimal.Round(item.VentaBruta, 2).ToString("N", formato)</b></td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style="">Monto Apertura:</td>
+                                <td align="right">@decimal.Round(item.MontoApertura, 2).ToString("N", formato)</td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style="">Cortes Efectivo:</td>
+                                <td align="right">@decimal.Round(item.CortesEfectivo, 2).ToString("N", formato)</td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style="">Efectivo:</td>
+                                <td align="right">@decimal.Round(item.Efectivo, 2).ToString("N", formato)</td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style="">Tarjetas:</td>
+                                <td align="right">@decimal.Round(item.Tarjetas, 2).ToString("N", formato)</td>
+
+                            </tr>
+                            <tr>
+
+                                <td align="left" style="">Dólares:</td>
+                                <td align="right">@decimal.Round(item.Dolares, 2).ToString("N", formato)</td>
+                                <td align="center">1$=</td>
+                                <td align="right">@decimal.Round(item.TipoCambio, 2).ToString("N", formato)</td>
+                            </tr>
+                            <tr>
+                                <td align="left">Conversión:</td>
+                                <td align="right">@decimal.Round(item.TipoCambio * item.Dolares, 2).ToString("N", formato)</td>
+                            </tr>
+                            <tr>
+                                <td align="left" style=""><b>Diferencia:</b></td>
+                                <td align="right"><b>@decimal.Round(item.Diferencia, 2).ToString("N", formato)</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+                <br />
+                <div class="row" style="justify-content: left;">
+                    <h2 style="margin-left: 30%;">Datos de las Facturas</h2>
+
+                </div>
+
+                <table style="border: none; width: 100%; height: 36px;" border="1">
+                    <thead>
+                        <tr style="height: 18px;">
+
+                            <th align="center" style="width: 33%;">Efectivo</th>
+                            <th align="center" style="width: 33%;">Tarjetas</th>
+                            <th align="center" style="width: 33%;">Dólares</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+
+                        <tr>
+                            <td align="right" style=" ">
+                                <p style="font-size:12px; "> @decimal.Round(item.EfectivoF, 2).ToString("N", formato)</p>
+                            </td>
+                            <td align="right" style=" "><p style="font-size:12px; "> @decimal.Round(item.TarjetasF, 2).ToString("N", formato)</p></td>
+                            <td align="right" style=" "><p style="font-size:12px; "> @Convert.ToInt32(item.DolaresF)  </p></td>
+                        </tr>
+
+
+
+
+
+
+
+                    </tbody>
+                </table>
+                <p>&nbsp;</p>
+
+                <hr style="border-color: black;" />
+                if (i % 2 == 0)
+                {
+                    <div class="cuidado"></div>
+                    <div class="html2pdf__page-break"></div>
+                }
+
+
+                i++;
+            }
+
+
+        </div>
+
+
+        <div id="Detallado">
+            @{
+                int j = 0;
+                var general2 = Model.EncVtas.ToList();
+            }
+            @foreach (var item in Model.EncVtas2)
+            {
+                @if (item.EncVtas.Count() > 0)
+                {
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-6">
+                                    <h3>No Cierre</h3>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label style="margin-top: 10px;">@item.NumCierre</label>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-6">
+                                    <p><strong>Fecha:</strong></p>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>@item.Fecha.ToShortDateString()</label>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-6">
+                          
+
+
+                            <div class="form-group row" style="margin-top: 9px;">
+                                <div class="col-sm-6">
+                                    <p><strong>Caja:</strong></p>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>@item.CodCaja</label>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6">
+                                    <p><strong>Cajero:</strong></p>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label style="">@item.CodCajero - @((Model.Cajeros.Where(a => a.CodCajero == item.CodCajero).FirstOrDefault() == null ? "": Model.Cajeros.Where(a => a.CodCajero == item.CodCajero).FirstOrDefault().NomCajero))</label>
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                }
+
+                @foreach (var det in item.EncVtas.GroupBy(a => a.CodTarjeta).ToList())
+                {
+
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label style="font-weight: bold;" id="FechaInicial">Tarjeta:</label>
+                            <br />
+
+
+                        </div>
+                        <div class="col-sm-6" style="text-align: left;">
+                            <label> @det.Key - @((Model.Tarjetas.Where(a => a.CodTarjeta == det.Key).FirstOrDefault() == null ? "": Model.Tarjetas.Where(a => a.CodTarjeta == det.Key).FirstOrDefault().NomTarjeta))</label>
+                            <br />
+
+
+                        </div>
+                    </div>
+                    <br />
+
+                    <table style="border: none; width: 100%; height: 36px;" border="1">
+                        <thead>
+                            <tr style="height: 18px;">
+                                <th align="center" style="height: 18px; text-align: center;">Factura</th>
+                                <th align="center" style="height: 18px; text-align: center;">Num Tarjeta</th>
+                                <th align="center" style="height: 18px; text-align: center;">Monto</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item2 in det)
+                            {
+
+
+                                <tr style="height: 18px; border: none; border-color: #fff;">
+                                    <td style="width: 20%; height: 18px; text-align: center;">@item2.NumFactura</td>
+
+
+                                    <td style="width: 20%; text-align: center; height: 18px;">@item2.NumTarjeta</td>
+                                    <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(item2.MtoTarjeta.Value, 2).ToString("N", formato)</td>
+
+                                </tr>
+
+                            }
+
+                            <tr>
+
+                                <td></td>
+                                <td align="left" style="">
+                                    <p style="font-size: 15px; font-weight: 600;">Total</p>
+                                </td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(det.Sum(a => a.MtoTarjeta).Value, 2).ToString("N", formato) </p></td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+
+
+
+
+                <p>&nbsp;</p>
+                @if (item.EncVtas.Count() > 0)
+                {
+                    <table style="border: none; width: 100%; height: 36px;" border="1">
+                        <tbody>
+                            <tr>
+
+                                <td align="center" style="height: 18px; text-align: center; width: 33%;"></td>
+                                <td align="left" style="width: 33%;">
+                                    <p style="font-size: 15px; font-weight: 600;">Total Cierre</p>
+                                </td>
+                                <td align="right" style="width: 33%;"><p style="font-size:15px;">  @decimal.Round(item.EncVtas.Sum(a => a.MtoTarjeta).Value, 2).ToString("N", formato) </p></td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr style="border-color: black;" />
+                }
+                if (i % 2 == 0)
+                {
+                    <div class="cuidado"></div>
+                    <div class="html2pdf__page-break"></div>
+                }
+
+
+                i++;
+            }
+
+            <table style="border: none; width: 100%; height: 36px;" border="1">
+                <tbody>
+                    <tr>
+
+                        <td align="center" style="height: 18px; text-align: center; width: 33%;"></td>
+                        <td align="left" style="width: 33%;">
+                            <p style="font-size: 15px; font-weight: 600;">Total General</p>
+                        </td>
+                        <td align="right" style="width: 33%;"><p style="font-size:15px;">  @decimal.Round(Model.EncVtas2.Sum(a => a.EncVtas.Sum(x => x.MtoTarjeta)).Value, 2).ToString("N", formato) </p></td>
+
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+</div>

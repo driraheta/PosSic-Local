@@ -1,0 +1,822 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Compras.NuevoModel
+@{
+    ViewData["Title"] = "Compras";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a>Compras</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Inclusión </strong>
+    </li>
+}
+@section TitleAction{
+    <a asp-page="./Index" class="nav-link text-dark"><i class="fa fa-arrow-circle-o-left "></i>  Regresar</a>
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+   /*     .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }*/
+        td {
+            border-bottom-style: solid !important;
+            border-bottom-width: 1px !important;
+            border-bottom-color: #dec2e6 !important;
+        }
+
+        h3 {
+            font-size: 13px !important;
+        }
+
+        th {
+            background-color: transparent !important;
+        }
+
+        td p {
+            font-weight: 300 !important;
+        }
+
+
+    </style>
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+    $(document).ready(function () {
+        jQuery(document).ready(function ($) {
+            $(document).ready(function () {
+                $('.mi-selector').select2();
+            });
+        });
+        $(".js-example-responsive").select2({
+            width: 'resolve',// need to override the changed default
+            height: 'resolve'
+        });
+
+    });
+        var Eliminar = [];
+        var ProdCadena = [];
+        var bandera = false;
+        var idP = 0;
+        var subtotal = 0;
+        var impuestos = 0;
+        var descuentos = 0;
+        var totalComprobante = 0;
+    function onChangeProducto() {
+        console.log("Producto: " + $("#CodPro").val());
+
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Nuevo", "Producto")',
+            data: { id: $("#CodPro").val() },
+            success: function (result) {
+
+                console.log(result);
+
+                if (result.codPro != "") {
+
+                    $("#Nombre").val(result.nomPro);
+                    $("#PrecioVenta").text(formatoDecimal(result.precioVenta.toFixed(2)));
+                    $("#Costo").val(result.costoPro);
+                    $("#UnidadMedida").text(result.uniMed);
+                    $("#Cantidad").val(1),
+                        $("#Descuento").val(0),
+                        $("#Impuesto").val(result.impuestoTarifa)
+
+                    //$("#Cantidad").val(result.existencia);
+                }
+
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+
+        }
+
+        function InsertarProductoTabla() {
+            if (!bandera) {
+
+
+                if ($("#Nombre").val() != "") {
+
+
+                    var detalle = {
+                        codPro: $("#CodPro").val(),
+                        NomPro: $("#Nombre").val(),
+                        PreVta: $("#Costo").val(),
+                        cantidad: $("#Cantidad").val(),
+                        descuento: $("#Descuento").val(),
+                        impuesto: $("#Impuesto").val()
+                    };
+                    ProdCadena.push(detalle);
+
+                    var subtotalT = 0;
+                    var descuentoT = 0;
+                    var impuestoT = 0;
+                    var totalT = 0;
+                    subtotalT = detalle.PreVta * detalle.cantidad
+                    descuentoT = subtotalT * (detalle.descuento / 100);
+                    impuestoT = (subtotalT - descuentoT) * (detalle.impuesto / 100);
+
+                    totalT = (subtotalT - descuentoT) + impuestoT;
+
+                    subtotal += subtotalT;
+                    descuentos += descuentoT;
+                    impuestos += impuestoT;
+
+                    totalComprobante += totalT;
+
+                    $("#subtotal").text(formatoDecimal(parseFloat( subtotal).toFixed(2)));
+                    $("#descuento").text(formatoDecimal(parseFloat(descuentos).toFixed(2)));
+                    $("#impuesto").text(formatoDecimal( parseFloat(impuestos).toFixed(2)));
+                    $("#total").text(formatoDecimal(parseFloat(totalComprobante).toFixed(2)));
+
+
+                    $("#Nombre").val("");
+                    $("#PrecioVenta").text("");
+                    $("#Costo").val("");
+                    $("#UnidadMedida").text("");
+                    $("#Cantidad").val("");
+                    $("#Impuesto").val("");
+                    $("#Descuento").val("");
+
+                    RellenaTabla();
+                }
+            } else {
+                      var subtotalT = 0;
+                var descuentoT = 0;
+                var impuestoT = 0;
+                var totalT = 0;
+
+               
+
+                var detalle = {
+                    codPro: $("#CodPro").val(),
+                    NomPro: $("#Nombre").val(),
+                    PreVta: $("#Costo").val(),
+                    cantidad: $("#Cantidad").val(),
+                    descuento: $("#Descuento").val(),
+                    impuesto: $("#Impuesto").val()
+                };
+
+                if (ProdCadena[idP] != undefined) {
+
+                    if (ProdCadena[idP].codPro == detalle.codPro) {
+                        subtotalT = ProdCadena[idP].PreVta * ProdCadena[idP].cantidad
+                        descuentoT = subtotalT * (ProdCadena[idP].descuento / 100);
+                        impuestoT = (subtotalT - descuentoT) * (ProdCadena[idP].impuesto / 100);
+
+                        totalT = (subtotalT - descuentoT) + impuestoT;
+
+                        subtotal -= subtotalT;
+                        descuentos -= descuentoT;
+                        impuestos -= impuestoT;
+
+                        totalComprobante -= totalT;
+                        ProdCadena[idP] = detalle;
+                    } else {
+                        ProdCadena.push(detalle);
+                    }
+                } else {
+                    ProdCadena[idP] = detalle;
+                }
+
+                
+
+                subtotalT = 0;
+                  descuentoT = 0;
+                  impuestoT = 0;
+                  totalT = 0;
+                subtotalT = detalle.PreVta * detalle.cantidad
+                descuentoT = subtotalT * (detalle.descuento / 100);
+                impuestoT = (subtotalT - descuentoT) * (detalle.impuesto / 100);
+
+                totalT = (subtotalT - descuentoT) + impuestoT;
+
+                subtotal += subtotalT;
+                descuentos += descuentoT;
+                impuestos += impuestoT;
+
+                totalComprobante += totalT;
+
+                $("#subtotal").text(formatoDecimal(parseFloat(subtotal).toFixed(2)));
+                $("#descuento").text(formatoDecimal(parseFloat(descuentos).toFixed(2)));
+                $("#impuesto").text(formatoDecimal(parseFloat(impuestos).toFixed(2)));
+                $("#total").text(formatoDecimal(parseFloat(totalComprobante).toFixed(2)));
+
+
+                $("#Nombre").val("");
+                $("#PrecioVenta").text("");
+                $("#Costo").val("");
+                $("#UnidadMedida").text("");
+                $("#Cantidad").val("");
+                $("#Impuesto").val("");
+                $("#Descuento").val("");
+                 bandera = false;
+                    idP = 0;
+                RellenaTabla();
+            }
+        }
+            function escogeCodigo(i) {
+
+                $("#CodPro").val(ProdCadena[i].codPro).trigger('change');
+
+                $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Nuevo", "Producto")',
+                    data: { id: ProdCadena[i].codPro },
+            success: function (result) {
+
+                console.log(result);
+
+                if (result.codPro != "") {
+                    $("#Nombre").val(result.nomPro);
+                    $("#PrecioVenta").text(parseFloat( result.costoPro).toFixed(2)) ;
+                    $("#Costo").val(ProdCadena[i].PreVta);
+                    $("#UnidadMedida").text(result.uniMed);
+                    $("#Cantidad").val(ProdCadena[i].cantidad);
+                    $("#Descuento").val(ProdCadena[i].descuento),
+                        $("#Impuesto").val(ProdCadena[i].impuesto)
+                    bandera = true;
+                    idP = i;
+                    //EliminaProducto(i,i);
+
+
+
+                    //$("#Cantidad").val(result.existencia);
+                }
+
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+        function RellenaTabla() {
+            var sOptions = '';
+
+            $("#tbody").html('');
+
+            for (var i = 0; i < ProdCadena.length; i++) {
+                sOptions += '<tr>';
+                sOptions += '<td align="center" style="padding-top:13px;"> <input style="margin-left: -1%; position: inherit !important;" id="check' + i +'" class="form-check-input" type="checkbox" onclick = "javascript: AgruparNumeros(' + i + ')" /> ';
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].cantidad + '</p></td>';
+                sOptions += '<td align="center" style="padding-top:15px;">  <a style="font-size:13px; text-decoration: underline; color: blue;" onclick="javascript: escogeCodigo(' + i + ')">' + ProdCadena[i].codPro + '</a></td>';
+                sOptions += '<td align="left" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].NomPro + '</p></td>';
+                sOptions += '<td align="right" style="padding-top:13px;">  <p style="font-size:13px;">' + formatoDecimal(parseFloat(ProdCadena[i].PreVta).toFixed(2)) + '</p></td>';
+
+
+
+
+
+                sOptions += '</tr>'
+            }
+            $("#tbody").html(  sOptions  );
+        }
+        function AgruparNumeros(i) {
+            var checkbox1 = document.getElementById("check" + i);
+
+            if (checkbox1.checked) {
+                console.log("insersion " + i);
+
+                Eliminar.push(ProdCadena[i]);
+            } else {
+                console.log("eliminar " + i);
+                Eliminar.splice(ProdCadena.indexOf(ProdCadena[i]), 1);
+            }
+
+        }
+        function EliminaProducto( ) {
+           
+            Swal.fire({
+                title: '¿Desea eliminar estos productos?',
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: `Aceptar`,
+                denyButtonText: `Cancelar`,
+                customClass: {
+                    confirmButton: 'swalBtnColor',
+                    denyButton: 'swalDeny'
+                },
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    for (var i = 0; i < Eliminar.length; i++) {
+                        var campo = ProdCadena.indexOf(Eliminar[i]);
+                        console.log(ProdCadena[campo]);
+                        if (campo >= 0) {
+
+
+                            var subtotalT = 0;
+                            var descuentoT = 0;
+                            var impuestoT = 0;
+
+                            subtotalT = ProdCadena[campo].PreVta * ProdCadena[campo].cantidad
+                            descuentoT = subtotalT * (ProdCadena[campo].descuento / 100);
+                            impuestoT = (subtotalT - descuentoT) * (ProdCadena[campo].impuesto / 100);
+
+                            totalT = (subtotalT - descuentoT) + impuestoT;
+
+                            subtotal -= subtotalT;
+                            descuentos -= descuentoT;
+                            impuestos -= impuestoT;
+
+                            totalComprobante -= totalT;
+
+
+                            $("#subtotal").text(formatoDecimal(parseFloat(subtotal).toFixed(2)));
+                            $("#descuento").text(formatoDecimal(parseFloat(descuentos).toFixed(2)));
+                            $("#impuesto").text(formatoDecimal(parseFloat(impuestos).toFixed(2)));
+                            $("#total").text(formatoDecimal(parseFloat(totalComprobante).toFixed(2)));
+
+
+                            ProdCadena.splice(campo, 1);
+                            RellenaTabla();
+                        }
+                        }
+                        Eliminar = [];
+                    }
+                });
+
+        }
+
+        function LimpiarDatos() {
+            $("#Nombre").val("");
+            $("#PrecioVenta").text("");
+            $("#Costo").val("");
+            $("#UnidadMedida").text("");
+            $("#Cantidad").val("");
+            $("#Impuesto").val("");
+            $("#Descuento").val("");
+
+        }
+
+        function cerrarModalError() {
+            $("#Error").hide();
+            if ($('.modal-backdrop').is(':visible')) {
+
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').hide();
+            }
+        }
+        function Generar() {
+            var sub = $("#subtotal").text().toString().replace("₡", "");
+            var impto = $("#impuesto").text().toString().replace("₡", "");
+            var desc = $("#descuento").text().toString().replace("₡", "");
+            var compra = $("#total").text().toString().replace("₡", "");
+            var EncCompras =
+            {
+                NumCompra: $("#NoCompra").val(),
+
+                Detalle: $("#Detalle").val(),
+                FechaCompra: $("#Fecha").val(),
+                FechaVencimiento: $("#FechaV").val(),
+
+                CodProveedor: $("#Proveedor").val(),
+                SubTotal: sub,
+                ImptoVta: impto ,
+                TotalDescuento: desc  ,
+                TotalCompra: compra
+            };
+
+            var DetCompras = ProdCadena;
+
+
+            var recibido = {
+                EncCompras,
+                DetCompras
+            }
+
+             var enviar = {
+                EncCompras,
+                DetCompras
+            }
+            console.log(JSON.stringify(recibido));
+            //esto es una preuba
+            if (validar(EncCompras)) {
+                var recibidos = JSON.stringify(recibido);
+           
+                $.ajax({
+                    type: 'POST',
+                     
+                    url: '@Url.Page("Nuevo", "Generar")',
+                    dataType: 'text',
+                    data: { recibidos: recibidos.toString()},
+                        headers: {
+                            RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+                        },
+                    success: function (json) {
+
+                        $("#divProcesando").hide();
+
+                        if ($('.modal-backdrop').is(':visible')) {
+
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').hide();
+                        }
+                        console.log("resultado " + typeof(json));
+                        if (json == "true") {
+                            Swal.fire({
+                                title: "Ha sido guardado con éxito",
+
+                                icon: 'success',
+                                showCancelButton: false,
+
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'swalBtnColor',
+
+                                },
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            })
+
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Ha ocurrido un error al intentar guardar'
+
+                            })
+                        }
+                    },
+
+                    beforeSend: function (xhr) {
+
+                        $("#divProcesando").modal("show");
+                    },
+                    complete: function () {
+
+                    },
+                    error: function (error) {
+
+                    }
+                    });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Pareciera que aún falta un campo por llenar'
+
+                });
+            }
+
+        }
+
+        function validar(enc) {
+            console.log(enc);
+            if (enc.NumCompra == 0 || enc.NumCompra == null) {
+
+                return false;
+            }   else if (enc.FechaCompra == "" || enc.FechaCompra == null) {
+                return false;
+            } else if (enc.FechaVencimiento == "" || enc.FechaVencimiento == null) {
+                return false;
+            } else if (enc.CodProveedor == "" || enc.CodProveedor == null) {
+                return false;
+            } else if (ProdCadena.length == 0) {
+
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+
+        const formatter = new Intl.NumberFormat('es-CR', {
+            style: 'currency',
+            currency: 'CRC',
+            minimumFractionDigits: 0
+        })
+    </script>
+
+}
+
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox ">
+
+            <div class="ibox-content">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <label class="col-form-label">No. Compra:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-8">
+
+                                <input type="number" id="NoCompra" class="form-control">
+                            </div>
+                        </div>
+
+                        <label class="col-form-label">Fecha:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input type="date" id="Fecha" class="form-control">
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <label class="col-form-label">Proveedor:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <select id="Proveedor" class="form-control  mi-selector">
+                                    @*<option value="00" selected>-Seleccione-</option>*@
+                                    @foreach (var item in Model.Proveedores)
+                                    {
+                                        <option value="@item.CodProveedor">@item.NomProveedor</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+                        <label class="col-form-label">Fecha Vencimiento:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input type="date" id="FechaV" class="form-control">
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="ibox">
+
+            <div class="ibox-content">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="col-form-label">Producto:</label>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <select id="CodPro" onchange="javascript: onChangeProducto(); " class="form-control  mi-selector">
+                                    <option value="00" selected>-Seleccione-</option>
+                                    @foreach (var item in Model.Productos)
+                                    {
+                                        <option value="@item.CodPro">@item.CodPro - @item.NomPro</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+
+
+                        <input id="Nombre" hidden readonly type="text" class="form-control">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
+                                        <label class="col-form-label">Precio:</label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <label id="PrecioVenta" style="line-height: 32px;">
+                                        </label>
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label class="col-form-label">Costo:</label>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input id="Costo" type="number" min="1" onchange="javascript: revisarNumero(event, 'Costo');" pattern="^[0-9]+" class="form-control numero" onpaste="return false;" onDrop="return false;">
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label class="col-form-label">Descuento:</label>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input id="Descuento" type="number" onchange="javascript: validaNegativosyMayores100(event, 'Descuento');" pattern="^[0-9]+" class="form-control numero" onpaste="return false;" onDrop="return false;">
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
+                                        <label class="col-form-label">Unid. Medida:</label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <label id="UnidadMedida" style="line-height: 32px;">
+                                        </label>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+
+                                        <label class="col-form-label">Cantidad:</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input id="Cantidad" type="number" min="1" onchange="javascript: revisarNumero(event, 'Cantidad');"  pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==9) return false;" class="form-control numero" onpaste="return false;" onDrop="return false;">
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label class="col-form-label">Impuesto:</label>
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input id="Impuesto" type="number" onchange="javascript: validaNegativosyMayores100(event, 'Impuesto');" pattern="^[0-9]+" class="form-control numero" onpaste="return false;" onDrop="return false;">
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+
+
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-sm-12" style="text-align: center;">
+                <a title="Eliminar" onclick="javascript: LimpiarDatos();" style="width: 25%;" class="btn btnpage">Cancelar</a>&nbsp;
+                <a title="Agregar" id="Agregar" onclick="javascript: InsertarProductoTabla();" style="background-color: #A5CC9C; border-color: #A5CC9C; color: #fff; width: 25%;" class="btn btn-primary">Guardar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="ibox">
+
+            <div class="ibox-content lista">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive tableFixHead" style="padding:inherit; overflow-y:scroll;    z-index: 5; height: 275px;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th align="center" style="width: 10%; text-align: center;"><img src="~/img/Botones/equis.png" onclick="javascript: EliminaProducto();" style="height: 20px; width: 20px; margin-top: 3px;" /></th>
+                                        <th align="center" style="width: 1%; text-align: center;"><h3>Cantidad</h3></th>
+                                        <th align="center" style="width: 10%; text-align: center;"><h3>Código</h3></th>
+                                        <th align="center" style="width: 50%; text-align: center;"><h3>Nombre </h3></th>
+                                        <th align="center" style="width: 14%; text-align: center;"><h3>Costo</h3></th>
+
+
+                                    </tr>
+
+                                </thead>
+                                <tbody id="tbody">
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-6">
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+                        <div class="row">
+
+                            <div class="col-sm-12">
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-family: 'Poppins' !important; font-weight: 500 !important; font-style: normal;">SubTotal:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="subtotal" style="display: inline-table; font-family: 'Poppins' !important; font-weight: bold !important; font-style: normal;">0</label>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-family: 'Poppins' !important; font-weight: 500 !important; font-style: normal;"> Descuento:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="descuento" style="display: inline-table; font-family: 'Poppins' !important; font-weight: bold !important; font-style: normal;">0</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-family: 'Poppins' !important; font-weight: 500 !important; font-style: normal;"> Impuesto:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="impuesto" style="display: inline-table; font-family: 'Poppins' !important; font-weight: bold !important; font-style: normal;">0</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-family: 'Poppins' !important; font-weight: 500 !important; font-style: normal;"> Total:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="total" style="display: inline-table; font-family: 'Poppins' !important; font-weight: bold !important; font-style: normal;">0</label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+    <div class="d-flex justify-content-end">
+        <button onclick="javascript: Generar();" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+    </div>
+</div>   
+             
+            
+   
+    
+
+        <!--Modal Error CAntidad-->
+        <div class="modal" id="Error" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h2>Error</h2>
+                    </div>
+
+                    <div class="modal-body">
+                        <h3 style="color: #FF0000">Ha ocurrido un error al intentar guardar</h3>
+                    </div>
+
+                    <div class="modal-footer">
+                        <center>
+                            <button type="button" class="btn btn btn-primary" id="Guardar" style="border-radius: 20px;" onclick="javascript: cerrarModalError()">Aceptar</button>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>

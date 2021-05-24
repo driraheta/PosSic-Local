@@ -1,0 +1,269 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Lineas.IndexModel
+@{
+    ViewData["Title"] = "Líneas";
+}
+@using System.Globalization;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Resumen</strong>
+    </li>
+}
+
+@section TitleAction{
+    <a asp-page="Nuevo" class="btn btn-primary" title="Agregar"><i class="fa fa-plus"></i> Agregar Línea</a>
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+
+            $('.dataTables-example').DataTable({
+                pageLength: 10,
+                responsive: true,
+
+
+            });
+
+        });
+        var ids = 0;
+    function onClickModal(id) {
+        ids = id;
+        //$("#Eliminar").show();
+        Swal.fire({
+            title: '¿Desea eliminar esta línea?',
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: `Aceptar`,
+            denyButtonText: `Cancelar`,
+            customClass: {
+                confirmButton: 'swalBtnColor',
+                denyButton: 'swalDeny'
+            },
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+
+                Eliminar();
+
+            }
+        })
+
+
+    }
+        function  Eliminar() {
+
+         $.ajax({
+                        type: 'GET',
+                        dataType: 'json',
+                        url: '@Url.Page("Index", "Eliminar")',
+                        data: { id: ids },
+             success: function (result) {
+                 $("#divProcesando").modal("hide");
+                             if (result == false) {
+                                 ids = 0;
+                                 Swal.fire({
+                                     icon: 'error',
+                                     title: 'Oops...',
+                                     text: 'Ha ocurrido un error al intentar eliminar'
+
+                                 })
+                                 //$("#Eliminar").hide();
+                                // $("#Error").show();
+
+                             } else {
+                                 Swal.fire({
+                                     title: "Ha sido eliminado con éxito",
+
+                                     icon: 'success',
+                                     showCancelButton: false,
+                                     customClass: {
+                                         confirmButton: 'swalBtnColor',
+
+                                     },
+                                     confirmButtonText: 'OK'
+                                 }).then((result) => {
+                                     if (result.isConfirmed) {
+                                         location.reload();
+                                     }
+                                 })
+                             }
+             },
+             beforeSend: function () {
+                 $("#divProcesando").modal("show");
+             }
+                     })
+        }
+        function cerrarModalError() {
+            $("#Error").hide();
+        }
+    function onClickCerrarModal() {
+        ids = 0;
+        $("#Eliminar").hide();
+        }
+        function reportePdf() {
+            var item = $(".table-responsive").html();
+            var opt = {
+                margin: [0, 0, 5, 0],
+
+
+                html2canvas: { scale: 2 },
+                jsPDF: { format: 'letter', orientation: 'portrait' }
+            };
+
+
+
+            html2pdf().set(opt)
+                .from(item)
+                .save("EstadoCuenta.pdf");
+
+        }
+    </script>
+}
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+<div class="ibox ">
+
+
+    <div class="ibox-content lista">
+        <br />
+        <div class="row">
+            <div class="col-md-3">
+
+
+                <h2>Líneas</h2>
+            </div>
+            <div class="col-md-6">
+                <div class="m-b-lg">
+                    <form method="get">
+                        <div class="form-row">
+                            <div class="input-group input-group-sm  col-md-12">
+                                <input asp-for="filtro.Texto" class="form-control" placeholder="Buscar Lineas">
+                                <span class="input-group-append">
+                                    <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+
+
+                    <div class="">
+
+
+
+                        <p style="font-size:14px;">Se encontraron @Model.Lineas.Length registros de líneas.</p>
+
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="col-md-3">
+
+               
+
+            </div>
+        </div>
+                    <input hidden id="lineas" value="@Model.Lineas.ToList()" />
+        <div class="table-responsive" style="padding:inherit;">
+            <table class="table table-striped dataTables-example" style="width: 100%;">
+                <thead>
+                    <tr>
+
+                        <td align="center" style="width: 25%;"><h3>Código Línea</h3></td>
+                        <td align="center" style="width: 50%;"><h3>Nombre de Línea</h3></td>
+
+
+                        <td align="center"><h3>Acción</h3></td>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Lineas)
+                    {
+                        <tr>
+
+                            <td align="center" style="padding-top:15px;">
+                                <p style="font-size:15px;"> @item.CodLinea</p>
+                            </td>
+                            @*<td align="center" style="padding-top:15px;"><h3> @item.NombreTipoHab</h3></td>*@
+                            <td align="left" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @item.NomLinea </p></td>
+
+                            <td align="center" style="padding-top:15px;">
+                                <a asp-page="./Editar" asp-route-id="@item.CodLinea" class="fa fa-edit icono"> </a> &nbsp;
+                                <a onclick="javascript: onClickModal('@item.CodLinea')" class="fa fa-trash icono"></a>
+
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <a asp-page="Nuevo" style="color: #FF0000;" title="Agregar"><i class="fa fa-plus"></i> Agregar Línea</a>
+    </div>
+</div>
+
+
+<!--Modal Eliminar-->
+<div class="modal" id="Eliminar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-title">
+
+                <center><h2 class="modal-title">¿Está seguro que desea eliminar esta línea ?</h2></center>
+            </div>
+            <div class="modal-footer">
+                <center>
+
+                    <button title="Cancelar" type="button" class="btn btnpage" style="border-radius:17px; width: 111px;" onclick="javascript: onClickCerrarModal()" title="Editar"><a style="text-decoration:none; color:black;" data-dismiss="modal">Cancelar</a></button>
+                    &nbsp;
+                    <button title="Eliminar" type="button" class="btn btn btn-primary" title="Eliminar" id="Guardar" style="border-radius: 20px;" onclick="javascript: Eliminar()">Aceptar</button>
+                </center>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!--Modal Error CAntidad-->
+<div class="modal" id="Error" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2>Error</h2>
+            </div>
+
+            <div class="modal-body">
+                <h3 style="color: #FF0000">No se puede eliminar esta línea</h3>
+            </div>
+
+            <div class="modal-footer">
+                <center>
+                    <button type="button" class="btn btn btn-primary" id="Guardar" style="border-radius: 20px;" onclick="javascript: cerrarModalError()">Aceptar</button>
+                </center>
+            </div>
+        </div>
+    </div>
+</div>

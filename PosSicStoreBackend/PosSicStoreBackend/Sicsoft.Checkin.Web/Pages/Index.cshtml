@@ -1,0 +1,125 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "PosSic Retail";
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a>PosSic Retail</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Resumen </strong>
+    </li>
+}
+
+@section scripts
+{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+   
+    <script>
+        $(document).ready(function () {
+
+            var exitoso = "@Model.CierreExitoso";
+            console.log(exitoso);
+
+            if (exitoso == "True") {
+                 Swal.fire(
+                'Cierre Diario Generado Exitosamente',
+                '',
+                'success');
+            }
+
+
+            TraerTipoCambio();
+
+
+        });
+        function TraerTipoCambio() {
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: '@Url.Page("Index", "TipoCambio")',
+                data: {   },
+                success: function (result) {
+
+                    console.log(result);
+
+                    if (result.success == true) {
+                        Swal
+                            .fire({
+                                title: "Tipo Cambio",
+
+                                input: "number",
+                                inputValue: result.tipocambio,
+                                html: "<span style='color: red; font-size: 11px;'> Tipo Cambio Sugerido BCCR </span>",
+
+                                showCancelButton: true,
+                                confirmButtonText: "Guardar",
+                                cancelButtonText: "Cancelar",
+
+                                customClass: {
+                                    confirmButton: 'swalBtnColor',
+                                    cancelButton: 'swalDeny'
+                                },
+                            })
+                            .then(resultado => {
+                                if (resultado.value) {
+                                    let tipoCambio = resultado.value;
+                                    console.log(tipoCambio);
+                                    $.ajax({
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        url: '@Url.Page("Index", "TipoCambioSetear")',
+                                        data: { id: tipoCambio },
+                                        success: function (result) {
+
+
+                                        },
+                                        beforeSend: function () {
+
+                                        },
+                                        error: function (ex) {
+
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Oops...',
+                                                text: ex.responseText
+
+                                            })
+                                        }
+
+                                    });
+                                }
+                            });
+                    }
+
+
+
+                },
+                beforeSend: function () {
+
+                },
+                error: function (ex) {
+
+                    console.log(ex);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: ex.responseText
+
+                    })
+                }
+
+            })
+
+        }
+    </script>
+}

@@ -1,0 +1,105 @@
+﻿@page
+@model Sicsoft.Checkin.Web.LoginModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/lib/animate.css/animate.min.css" />
+    <link rel="stylesheet" href="~/css/inspinia.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" href="~/img/favIcon.png" type="image/jpg" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        p {
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/Constantes.js"></script>
+    <script src="~/js/Login/Login.js"></script>
+</head>
+    
+
+ 
+
+<body class="light-skin" background="../img/tucan.jpg" style="width: 100%; height: 100%;">
+
+    <div class="middle-box text-center loginscreen animated fadeInDown" style=" background-color: white; border-radius: 10px;">
+
+        <div class="ibox" style="background-color: #fff;">
+            <div class="ibox-title" style="background-color: #fff;">
+
+                <div>
+
+                    <div style="height: 75px; width: 277px; margin-left: 59px;" class="logo-name"></div>
+
+                </div>
+            </div>
+            <div class="ibox-content" style="padding-left: 10%; padding-right: 10%; margin-top: -6%; background-color: #fff;">
+
+                <form class="m-t" role="form" method="post" id="formLogin">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <input class="form-control" hidden id="Token" asp-for="Token">
+                    <input class="form-control" hidden id="NombreCajero" asp-for="NombreCajero">
+                    <input class="form-control" hidden id="Seguridad" asp-for="Seguridad">
+                    <div class="form-group">
+                        <input class="form-control" id="CodComp" placeholder="Código de Compañía" onchange="javascript: BuscarCompañia('@Url.Page("Login", "Conectar")')">
+                        <p style="font-size: 16px; font-weight: bold; " id="Compañia"> </p>
+                        <span class="text-danger"></span>
+                    </div>
+                    @*<div class="form-group">
+            <input class="form-control" id="CodCaj" asp-for="Cierre.CodCaja" placeholder="Código Caja" onchange="javascript: BuscarCaja('@Url.Page("Login", "BuscarCaja")')">
+            <p id="Cajero">Caja: </p>
+            <span class="text-danger"></span>
+        </div>*@
+
+                    <div class="form-group">
+                        <input class="form-control" asp-for="Cierre.NomUsuario"   id="CodCajero" placeholder="Nombre Usuario">
+
+                        <span class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-control" id="CajPass" type="password" placeholder="Contraseña" onchange="javascript: IniciarSesion();">
+                        <p class="text-danger" id="ErrorClave"></p>
+                    </div>
+
+              
+                    <button type="submit" class="btn btn-primary block full-width m-b" id="btnSave">Iniciar sesión</button>
+
+           
+
+
+                </form>
+
+            </div>
+
+        </div>
+        
+
+
+
+        <p class="m-t" style="text-align: center;">
+            ©@DateTime.Now.Year, PosSic Retail, Todos los derechos reservados
+        </p>
+
+
+
+    </div>
+
+  
+    <partial name="_ValidationScriptsPartial" />
+
+</body>
+</html>

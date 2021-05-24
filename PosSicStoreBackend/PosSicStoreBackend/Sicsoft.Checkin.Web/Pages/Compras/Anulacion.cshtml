@@ -1,0 +1,313 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Compras.AnulacionModel
+@{
+    ViewData["Title"] = "Compras(Anulación)";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a>Compras</a>
+    </li>
+
+    <li class="breadcrumb-item active">
+        <strong>Anulación </strong>
+    </li>
+}
+@section TitleAction{
+
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script>
+    $(document).ready(function () {
+        jQuery(document).ready(function ($) {
+            $(document).ready(function () {
+                $('.mi-selector').select2();
+            });
+        });
+        $(".js-example-responsive").select2({
+            width: 'resolve',// need to override the changed default
+            height: 'resolve'
+        });
+
+    });
+        var ProdCadena = [];
+        var subtotal = 0;
+        var impuestos = 0;
+        var descuentos = 0;
+        var totalComprobante = 0;
+        function verificarMovimientos() {
+            $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Anulacion", "Movimientos")',
+                data: { id: $("#Proveedor").val() },
+            success: function (result) {
+
+                console.log(result);
+
+
+                var s = '';
+
+                $("#NoCompra").html('');
+                s += "<option value='00' selected> -Seleccione- </option>";
+                for (var i = 0; i < result.length; i++) {
+                    s += "<option value='" + result[i].numCompra + "'>" + result[i].numCompra + "  </option>";
+                }
+                $("#NoCompra").html(s);
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+
+         function Informacion() {
+            $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Anulacion", "MovimientosDetalle")',
+                data: { id: $("#NoCompra").val(), codMov: $("#Proveedor").val()},
+            success: function (result) {
+
+                console.log(result);
+
+               // $("#Proveedor").val(result.movimientos.proveedor);
+                $("#Fecha").val(result.movimientos.fechaCompra.split("T")[0]);
+                $("#FechaV").val(result.movimientos.fechaVencimiento.split("T")[0]);
+
+              
+                console.log(result.detalle.length);
+                for (var i = 0; i < result.detalle.length; i++) {
+                    var detalle = {
+                        codPro: result.detalle[i].codPro,
+                        NomPro: result.detalle[i].nomPro ,
+                        PreVta: result.detalle[i].costoPro,
+                        cantidad: result.detalle[i].cantidad,
+                        descuento: result.detalle[i].porDescuento,
+                        impuesto: result.detalle[i].imptoVta
+
+                    };
+
+                    ProdCadena.push(detalle);
+ 
+
+
+                    var subtotalT = 0;
+                    var descuentoT = 0;
+                    var impuestoT = 0;
+                    var totalT = 0;
+                    subtotalT = detalle.PreVta * detalle.cantidad
+                    descuentoT = subtotalT * (detalle.descuento / 100);
+                    impuestoT = (subtotalT - descuentoT) * (detalle.impuesto / 100);
+
+                    totalT = (subtotalT - descuentoT) + impuestoT;
+
+                    subtotal += subtotalT;
+                    descuentos += descuentoT;
+                    impuestos += impuestoT;
+
+                    totalComprobante += totalT;
+
+
+                    $("#subtotal").val(subtotal.toFixed(2));
+                    $("#descuento").val(descuentos.toFixed(2));
+                    $("#impuesto").val(impuestos.toFixed(2));
+                    $("#total").val(totalComprobante.toFixed(2));
+                }
+                RellenaTabla();
+
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+        function RellenaTabla() {
+            console.log(ProdCadena);
+            var sOptions = '';
+
+            $("#tbody").html('');
+
+            for (var i = 0; i < ProdCadena.length; i++) {
+                sOptions += '<tr>'
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].codPro + '</p></td>';
+                sOptions += '<td align="left" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].NomPro + '</p></td>';
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:15px;">' + ProdCadena[i].cantidad + '</p></td>';
+              
+
+
+
+
+                sOptions += '</tr>'
+            }
+            $("#tbody").html(sOptions);
+        }
+        function cerrarModalError() {
+            $("#Error").hide();
+        }
+
+    </script>
+
+}
+
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox ">
+        <div class="ibox-title">
+            <h2>
+                Mantenimiento de Compras (Anulación)
+            </h2>
+
+        </div>
+        <div class="ibox-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-sm-6">
+
+                    <label class="col-form-label">No. Compra:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+ 
+                            <select id="NoCompra" asp-for="Objeto.EncCompras.NumCompra" onchange="javascript: Informacion();" class="form-control  mi-selector">
+                                 
+                            </select>
+                        </div>
+                    </div>
+
+                    <label class="col-form-label">Fecha:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input type="date" id="Fecha" class="form-control">
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <div class="col-sm-6">
+                    <label class="col-form-label">Proveedor:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <select asp-for="Objeto.EncCompras.CodProveedor" onchange="javascript: verificarMovimientos();" id="Proveedor" class="form-control  mi-selector">
+                                <option value="00" selected>-Seleccione-</option>
+                                @foreach (var item in Model.Proveedores)
+                                {
+                                    <option value="@item.CodProveedor">@item.NomProveedor</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+                    <label class="col-form-label">Fecha Vencimiento:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input type="date" id="FechaV" class="form-control">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="ibox">
+        <div class="ibox-title">
+            <h2>Listado de Productos</h2>
+        </div>
+        <div class="ibox-content">
+            <div class="table-responsive tableFixHead" style="padding:inherit; overflow:scroll;    z-index: 5; height: 290px;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+
+                            <th align="center" style=" text-align: center;"><h3>Código</h3></th>
+                            <th align="center" style=" text-align: center;"><h3>Nombre </h3></th>
+                            <th align="center" style=" text-align: center;"><h3>Cantidad</h3></th>
+
+                        </tr>
+
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="col-form-label">SubTotal:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input id="subtotal" readonly type="number" class="form-control">
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Descuento:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input id="descuento" readonly type="number" class="form-control">
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Impuesto:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input id="impuesto" readonly type="number" class="form-control">
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-form-label">Total:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input id="total" readonly type="number" class="form-control">
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

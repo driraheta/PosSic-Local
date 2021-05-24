@@ -1,0 +1,123 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Account.CambiarContraseñaModel
+@{
+    ViewData["Title"] = "Cambio de Contraseña";
+}
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+@section breadcrumb{
+    <li class="breadcrumb-item">
+        <a>Cambio de Contraseña</a>
+    </li>
+
+    
+}
+@section TitleAction{
+
+}
+@section styles{
+    <link rel="stylesheet" href="~/lib/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <link href="~/lib/dropzone/basic.css" rel="stylesheet" />
+    <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
+    <link href="~/lib/iCheck/skins/square/green.css" rel="stylesheet" />
+    <link href="~/lib/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+
+}
+
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+     <script>
+
+         $(document).ready(function () {
+             $("#Guardar").attr("disabled", true);
+
+
+
+
+         });
+
+         function VerificarClave() {
+             if ($("#Clave").val() != $("#ClaveC").val()) {
+                 $("#ErrorClave").text("Error, contraseñas no coinciden");
+                 $("#Guardar").attr("disabled", true);
+             } else {
+                 if ($("#Clave").val() != "") {
+
+                     $("#Guardar").attr("disabled", false);
+                     $("#ErrorClave").text("");
+                 } else {
+                     $("#ErrorClave").text("");
+                 }
+             }
+
+         }
+     </script>
+
+}
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <div class="ibox">
+       
+        <div class="ibox-content">
+            <h2>Cambiar Contraseña</h2>
+            <div class="row">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="col-sm-12">
+                    <label class="col-form-label">Usuario:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <input type="text" asp-for="Usuario.Email" readonly id="Usuario" class="form-control">
+
+                        </div>
+                    </div>
+
+                    <label class="col-form-label">Nombre:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <input type="text" asp-for="Usuario.NomUsuario" readonly id="Nombre" class="form-control">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="col-form-label">Contraseña:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <input type="password" onchange="javascript: VerificarClave();" asp-for="Usuario.Clave" id="Clave" class="form-control">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="col-form-label">Repetir Contraseña:</label>
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <input onchange="javascript: VerificarClave();" type="password" id="ClaveC" class="form-control">
+                            <span class="text-danger" id="ErrorClave"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button id="Guardar" type="submit" class="btn btn-w-m btn-primary" title="Guardar">Guardar Cambios</button>
+    </div>
+</form>

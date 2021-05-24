@@ -1,0 +1,464 @@
+﻿@page
+@model Sicsoft.Checkin.Web.Pages.Reportes.ApartadosModel
+@{
+    ViewData["Title"] = "Reporte Apartados";
+}
+@using System.Globalization;
+@using Microsoft.AspNetCore.Http
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security.Claims;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.Extensions.Configuration;
+@using Refit;
+@using Sicsoft.Checkin.Web.Models;
+@section Title{
+    <h2><i></i> @ViewData["Title"]</h2>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">
+        <strong>Reportes</strong>
+    </li>
+}
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+
+
+}
+@section TitleAction{
+
+}
+@section scripts{
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/summernote/summernote-bs4.min.js"></script>
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <script src="~/lib/dropzone/dropzone.js"></script>
+    <script src="~/lib/iCheck/icheck.js"></script>
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+                $(document).ready(function () {
+                    $('.mi-selector').select2();
+                });
+            });
+            $(".js-example-responsive").select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+
+            checkDetallado();
+
+        });
+
+        function reportePdf() {
+            var checkbox1 = document.getElementById("divDetallado");
+
+            var combo = document.getElementById("CodProv");
+            var Proveedor = combo.options[combo.selectedIndex].text;
+            var item = "";
+            item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
+            item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
+            item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
+            item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Apartados</b></p>';
+            item += '<br>';
+            item += '<p style="text-align: left; "><strong>Fechas</strong>: ' + $("#FecInicial").val() + ' - ' + $("#FecFinal").val() + '</p>';
+
+            if (Proveedor != "-Seleccione Cliente-") {
+                item += '<p style="text-align: left; "><strong>Cliente</strong>: ' + Proveedor + '</p>';
+                item += '<br>';
+            }
+
+            if (checkbox1.checked) {
+                item += $("#Detallado").html();
+                var opt = {
+                    margin: [10, 5, 15, 5],
+                    pagebreak: { before: '.cuidado' },
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { format: 'letter', orientation: 'portrait' }
+                };
+
+                console.log(opt);
+
+                html2pdf().set(opt)
+                    .from(item)
+                    .save("Reporte_de_Apartados.pdf");
+            } else {
+
+                item += $(".table-responsive").html();
+                var opt = {
+                    margin: [10, 5, 15, 5],
+                    pagebreak: { avoid: 'tr' },
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { format: 'letter', orientation: 'portrait' }
+                };
+
+                console.log(opt);
+
+                html2pdf().set(opt)
+                    .from(item)
+                    .save("Reporte_de_Apartados.pdf");
+            }
+        
+
+        }
+ 
+        function Excel() {
+            // $("#tlbIndexDash1").tableExport();
+            var table = $(".table-responsive");
+            var html = table.html();
+            var htmls = "";
+            var uri = 'data:application/vnd.ms-Excel;base64,';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            };
+
+            var format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                })
+            };
+
+            htmls = html;
+
+            var ctx = {
+                worksheet: 'reporte',
+                table: htmls
+            }
+
+
+            var link = document.createElement("a");
+            link.download = "Reporte de Apartados.xls";
+            link.href = uri + base64(format(template, ctx));
+            link.click();
+        }
+        function checkDetallado() {
+            var checkbox1 = document.getElementById("divDetallado");
+
+            if (checkbox1.checked) {
+                $("#noDetallado").hide();
+                $("#Detallado").show();
+            } else {
+                $("#noDetallado").show();
+                $("#Detallado").hide();
+            }
+        }
+    </script>
+}
+<link rel="stylesheet" href="~/css/reportes.css" />
+<style>
+    h3 {
+        font-weight: bold;
+    }
+</style>
+<div class="ibox">
+    <div class="ibox-content">
+        <form method="get">
+            <h2>Filtros:</h2>
+
+            <div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <select asp-for="filtro.Codigo" id="CodProv" class="form-control  mi-selector">
+                            <option value="NULL" selected>-Seleccione Cliente-</option>
+                            @foreach (var item in Model.Clientes)
+                            {
+                                <option value="@item.CodCliente">@item.NomCliente</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <input class="form-control" id="FecInicial" type="date" asp-for="filtro.FechaInicial" />
+                    </div>
+                    <div class="col-sm-3">
+                        <input class="form-control" id="FecFinal" type="date" asp-for="filtro.FechaFinal" />
+                    </div>
+                    <div class="col-sm-3">
+                        <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>&nbsp;
+                        <a onclick="javascript: reportePdf()" title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        <a onclick="javascript: Excel()" title="Exportar a Excel" class="btn btnExcel">EXCEL</a>
+                    </div>
+                    <div class="col-sm-12">
+                        <br />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                            Vencidos
+                            <input type="checkbox" id="check1" asp-for="filtro.Vencidos" />
+                            <span class="check"></span>
+                        </label>
+
+
+
+
+
+
+                    </div>
+                    <div class="col-md-3">
+                        <label class="checkbox" style="text-decoration: none; font-size: 13px;">
+                            Sin Cancelar
+                            <input type="checkbox" id="check1" asp-for="filtro.SCancelar" />
+                            <span class="check"></span>
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label class="checkbox" onchange="javascript: checkDetallado();" style="text-decoration: none; font-size: 13px;">
+                            Detallado
+                            <input type="checkbox" id="divDetallado" asp-for="filtro.Detallado" />
+                            <span class="check"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="ibox">
+    <div class="ibox-content lista">
+        
+        <br />
+        <div id="noDetallado">
+            <div class="table-responsive" style="padding:inherit;">
+                <table class="table  dataTables-example" style="width: 100%; ">
+                    <thead>
+                        <tr>
+
+                            <td align="center" style="width: 10%;"><h3>No.Apdo</h3></td>
+                            <td align="center" style="width: 10%;"><h3>Fecha</h3></td>
+                            <td align="center" style="width: 10%;"><h3>Vence</h3></td>
+                            <td align="center" style="width: 45%;"><h3>Cliente</h3></td>
+                            <td align="center" style="width: 5%;"><h3>Compra</h3></td>
+                            <td align="center" style="width: 5%;"><h3>Abonos</h3></td>
+                            <td align="center" style="width: 5%;"><h3>Total</h3></td>
+
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model.Apartados)
+                        {
+                            <tr>
+
+                                <td align="center" style="">
+                                    <p style="font-size:15px; font-weight: bold;"> @item.NumApartado</p>
+                                </td>
+                                <td align="center" style=""><p style="font-size:15px;"> @item.FecApartado.ToString("dd/MM/yyyy")</p></td>
+                                <td align="center" style=""><p style="font-size:15px;"> @item.FecVence.ToString("dd/MM/yyyy")</p></td>
+                                @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
+                                {
+                                    <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
+                                }
+                                else
+                                {
+                                    <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
+                                }
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(item.Total.Value, 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(item.AbonoCompra, 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((item.Total - item.AbonoCompra).Value, 2).ToString("N", formato) </p></td>
+
+
+
+
+                            </tr>
+
+                        }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td align="left" style="">
+                            <p style="font-size: 15px; font-weight: 600;">Total</p>
+                        </td>
+                        <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.Apartados.Sum(a => a.Total).Value, 2).ToString("N", formato) </p></td>
+                        <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.Apartados.Sum(a => a.AbonoCompra), 2).ToString("N", formato) </p></td>
+                        <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.Apartados.Sum(a => a.Total) - Model.Apartados.Sum(a => a.AbonoCompra)).Value, 2).ToString("N", formato) </p></td>
+                        
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+
+        <div id="Detallado">
+            @{
+                int i = 0;
+            }
+            @foreach (var item in Model.Apartados)
+            {
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <h3>No Apartado</h3>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label style="margin-top: 10px;">@item.NumApartado</label>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <p><strong>Fecha Apartado:</strong></p>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label>@item.FecApartado.ToString("dd/MM/yyyy")</label>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <p><strong>Fecha Vencimiento:</strong></p>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label>@item.FecVence.ToString("dd/MM/yyyy")</label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+                            <div class="form-group row">
+                                <div class="col-sm-6">
+                                    <h2 hidden>No Apartado</h2>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label hidden style="margin-top: 10px;">@item.NumApartado</label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="margin-top: 35px;">
+                            <div class="col-sm-2">
+                                <p><strong>Cliente: </strong></p>
+
+                            </div>
+                            <div class="col-sm-6" style="text-align: center">
+                                @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
+                                {
+                                    <label>@Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</label>
+
+                                }
+                                else
+                                {
+                                    <label>No existe el cliente</label>
+                                }
+
+
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <p><strong>Vendedor: </strong></p>
+
+                            </div>
+                            <div class="col-sm-6" style="text-align: center">
+                                @if (Model.Vendedores.Where(a => a.CodVendedor == item.CodVendedor).FirstOrDefault() != null)
+                                {
+                                    <label>@Model.Vendedores.Where(a => a.CodVendedor == item.CodVendedor).FirstOrDefault().NomVendedor</label>
+
+                                }
+                                else
+                                {
+                                    <label>No existe el vendedor</label>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+                <table style="border: none; width: 100%; height: 36px;" border="1">
+                    <thead>
+                        <tr style="height: 18px;">
+                            <th align="center" style="height: 18px; text-align: center;">Cod Prod</th>
+                            <th align="center" style="height: 18px; text-align: center;">Nom Prod</th>
+                            <th align="center" style="height: 18px; text-align: center;">Unidades</th>
+                            <th align="center" style="height: 18px; text-align: center;">Precio</th>
+                            <th align="center" style="height: 18px; text-align: center;">Abonos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var det in item.Detalle)
+                        {
+
+                            <tr style="height: 18px; border: none; border-color: #fff;">
+                                <td style="width: 20%; height: 18px; text-align: center;">@det.CodPro</td>
+                                @if (Model.Productos.Where(a => a.CodPro == det.CodPro).FirstOrDefault() != null)
+                                {
+                                    <td style="width: 20%; height: 18px;">@Model.Productos.Where(a => a.CodPro == det.CodPro).FirstOrDefault().NomPro</td>
+
+                                }
+                                else
+                                {
+                                    <td style="width: 20%; height: 18px;"></td>
+                                }
+                                <td style="width: 20%; text-align: center; height: 18px;">@decimal.Round(det.Cantidad, 2).ToString("N", formato)</td>
+                                <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
+                                <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <p>&nbsp;</p>
+                <table style="height: 54px; width: 53.3203%; border-collapse: collapse; border-color: #ffffff; margin-left: auto; margin-right: auto;" border="0">
+                    <thead>
+                        <tr style="height: 18px;">
+                            <th align="center" style="width: 37.3626%; text-align: center; height: 18px;">Mto Compra</th>
+                            <th align="center" style="width: 29.304%; text-align: center; height: 18px;">Abonos</th>
+                            <th align="center" style="width: 33.3333%; text-align: center; height: 18px;">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="height: 36px;">
+                            <td style="width: 37.3626%; height: 36px; text-align: right;">@decimal.Round(item.Total.Value, 2).ToString("N", formato)</td>
+                            <td style="width: 29.304%; height: 36px; text-align: right;">@decimal.Round(item.AbonoCompra, 2).ToString("N", formato)</td>
+                            <td style="width: 33.3333%; height: 36px; text-align: right;">@decimal.Round((item.Total - item.AbonoCompra).Value, 2).ToString("N", formato)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>&nbsp;</p>
+                <hr style="border-color: black;" />
+
+                if (i % 2 == 0)
+                {
+                    <div class="cuidado"></div>
+                    <div class="html2pdf__page-break"></div>
+                }
+
+
+                i++;
+            }
+        </div>
+    </div>
+
+
+</div>
