@@ -23,7 +23,7 @@ namespace Sicsoft.Checkin.Web.Models
         [StringLength(10)]
         public string CodPro { get; set; }
 
-        public short Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
 
         [Column(TypeName = "money")]
         public decimal PrecioVenta { get; set; }

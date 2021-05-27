@@ -211,19 +211,24 @@
             </li>
 
             <li class="">
-                <a href="#">  <span class="nav-label"> Parámetros</span><span class="fa arrow"></span></a>
+                <a href="#">  <span class="nav-label"> Procesos</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" aria-expanded="false">
 
 
+                    @if (!string.IsNullOrEmpty(Roles.Where(a => a == "27").FirstOrDefault()))
+                    {
+                        <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("CierreCaja") ? "active" : null)">
+                            <a asp-page="/CierreCaja/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Caja</span><span class="fa arrow"></span></a>
 
-                    <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("MovimientoInventarios")?"active":null)">
-                        <a asp-page="/Parametro/Index" asp-route-id="1"><i class=""></i><span class="nav-label" id="InicioButton">Configurar</span><span class="fa arrow"></span></a>
+                        </li>
+                    }
+                    @if (!string.IsNullOrEmpty(Roles.Where(a => a == "26").FirstOrDefault()))
+                    {
+                        <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("CierreDiario") ? "active" : null)">
+                            <a asp-page="/CierreDiario/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Diario</span><span class="fa arrow"></span></a>
 
-                    </li>
-
-
-
-
+                        </li>
+                    }
 
                 </ul>
             </li>
@@ -251,66 +256,66 @@
 
 
                             @if (!string.IsNullOrEmpty(Roles.Where(a => a == "43").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasDiarias") ? "active" : null)">
-                                <a asp-page="/Reportes/VentasDiarias"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Diarias</span><span class="fa arrow"></span></a>
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasDiarias") ? "active" : null)">
+                                    <a asp-page="/Reportes/VentasDiarias"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Diarias</span><span class="fa arrow"></span></a>
 
-                            </li>
-                    }
+                                </li>
+                            }
                             @if (!string.IsNullOrEmpty(Roles.Where(a => a == "45").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasXProducto") ? "active" : null)">
-                                <a asp-page="/Reportes/VentasXProducto"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Producto</span><span class="fa arrow"></span></a>
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasXProducto") ? "active" : null)">
+                                    <a asp-page="/Reportes/VentasXProducto"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Producto</span><span class="fa arrow"></span></a>
 
-                            </li>
-                    }
+                                </li>
+                            }
                             @if (!string.IsNullOrEmpty(Roles.Where(a => a == "44").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasResumen") ? "active" : null)">
-                                <a asp-page="/Reportes/VentasResumen"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Resumen</span><span class="fa arrow"></span></a>
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasResumen") ? "active" : null)">
+                                    <a asp-page="/Reportes/VentasResumen"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Resumen</span><span class="fa arrow"></span></a>
 
-                            </li>
-                    }
+                                </li>
+                            }
 
 
                             <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/VentasXHora")?"active":null)">
-                                <a asp-page="/Reportes/VentasXHora"><i class=""></i><span class="nav-label" id="InicioButton">Ventas Horas</span><span class="fa arrow"></span></a>
+                                <a asp-page="/Reportes/VentasXHora"><i class=""></i><span class="nav-label" id="InicioButton">Ventas por Horas</span><span class="fa arrow"></span></a>
 
                             </li>
 
                             @if (!string.IsNullOrEmpty(Roles.Where(a => a == "42").FirstOrDefault()))
-                        {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/CierreCaja") ? "active" : null)">
-                                <a asp-page="/Reportes/CierreCaja"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Caja</span><span class="fa arrow"></span></a>
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/CierreCaja") ? "active" : null)">
+                                    <a asp-page="/Reportes/CierreCaja"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Caja</span><span class="fa arrow"></span></a>
 
-                            </li>
-                        }
+                                </li>
+                            }
 
 
                         </ul>
                     </li>
 
                     <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Clientes")?"active":null)">
-                        <a asp-page="/Reportes/Clientes"><i class=""></i><span class="nav-label" id="InicioButton">Clientes</span><span class="fa arrow"></span></a>
-
+                        @*<a asp-page="/Reportes/Clientes"><i class=""></i><span class="nav-label" id="InicioButton">Clientes</span><span class="fa arrow"></span></a>*@
+                        <a asp-page="/Reportes/Clientes"><span class="nav-label" id="InicioButton">Clientes</span><span class="fa arrow"></span></a>
                     </li>
                     <li class="">
                         <a href="#">  <span class="nav-label"> Apartados</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-third-level collapse" aria-expanded="false">
                             @if (!string.IsNullOrEmpty(Roles.Where(a => a == "40").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Apartados") ? "active" : null)">
-                                <a asp-page="/Reportes/Apartados"><i class=""></i><span class="nav-label" id="InicioButton">Apartados</span><span class="fa arrow"></span></a>
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Apartados") ? "active" : null)">
+                                    <a asp-page="/Reportes/Apartados"><i class=""></i><span class="nav-label" id="InicioButton">Apartados</span><span class="fa arrow"></span></a>
 
-                            </li>
-                    }
+                                </li>
+                            }
                             @if (!string.IsNullOrEmpty(Roles.Where(a => a == "41").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Abonos") ? "active" : null)">
-                                <a asp-page="/Reportes/Abonos"><i class=""></i><span class="nav-label" id="InicioButton">Abonos</span><span class="fa arrow"></span></a>
+                            {
+                                <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("Reportes/Abonos") ? "active" : null)">
+                                    <a asp-page="/Reportes/Abonos"><i class=""></i><span class="nav-label" id="InicioButton">Abonos</span><span class="fa arrow"></span></a>
 
-                            </li>
-                    }
+                                </li>
+                            }
 
                         </ul>
                     </li>
@@ -364,43 +369,21 @@
 
                         </ul>
                     </li>
-
-
-
-                    
-
-
-
-
                 </ul>
+            </li>
+
+
+            <li class="">
+                <a href="#">  <span class="nav-label"> Parámetros</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" aria-expanded="false">
+                    <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("MovimientoInventarios")?"active":null)">
+                        <a asp-page="/Parametro/Index" asp-route-id="1"><i class=""></i><span class="nav-label" id="InicioButton">Configurar</span><span class="fa arrow"></span></a>
+
                     </li>
-
-
-
-                    <li class="">
-                        <a href="#">  <span class="nav-label"> Procesos</span><span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level collapse" aria-expanded="false">
-
-
-                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "27").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("CierreCaja") ? "active" : null)">
-                                <a asp-page="/CierreCaja/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Caja</span><span class="fa arrow"></span></a>
-
-                            </li>
-                    }
-                            @if (!string.IsNullOrEmpty(Roles.Where(a => a == "26").FirstOrDefault()))
-                    {
-                            <li class="@(httpContextAccessor.HttpContext.Request.RouteValues["Page"].ToString().Contains("CierreDiario") ? "active" : null)">
-                                <a asp-page="/CierreDiario/Index"><i class=""></i><span class="nav-label" id="InicioButton">Cierre Diario</span><span class="fa arrow"></span></a>
-
-                            </li>
-                    }
-
-                        </ul>
-                    </li>
-
                 </ul>
+            </li>
+
+        </ul>
 
     </div>
 </nav>
