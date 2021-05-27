@@ -162,29 +162,32 @@
 
 
                     <div class="col-sm-4">
-                        <select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">
+                        @*<select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">*@
+                        <select asp-for="filtro.CodCaja" id="CodCaja" class="form-control  mi-selector">
                             <option value="NULL" selected>-Seleccione Caja-</option>
                             @foreach (var item in Model.Cajas)
                             {
-                            <option value="@item.CodCaja">@item.CodCaja - @item.NomCaja</option>
+                                <option value="@item.CodCaja">@item.CodCaja - @item.NomCaja</option>
                             }
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <select asp-for="filtro.CodBarras" id="CodCajero" class="form-control  mi-selector">
+                        <select asp-for="filtro.CodProveedor" id="CodCajero" class="form-control  mi-selector">
+                            @*<select asp-for="filtro.CodBarras" id="CodCajero" class="form-control  mi-selector">*@
                             <option value="NULL" selected>-Seleccione Cajero-</option>
                             @foreach (var item in Model.Cajeros)
                             {
-                            <option value="@item.CodCajero">@item.CodCajero - @item.NomCajero</option>
+                                <option value="@item.CodCajero">@item.CodCajero - @item.NomCajero</option>
                             }
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <select asp-for="filtro.Texto" id="CodVend" class="form-control  mi-selector">
+                        <select asp-for="filtro.CodVendedor" id="CodVend" class="form-control  mi-selector">
+                            @*<select asp-for="filtro.Texto" id="CodVend" class="form-control  mi-selector">*@
                             <option value="NULL" selected>-Seleccione Vendedor-</option>
                             @foreach (var item in Model.Vendedores)
                             {
-                            <option value="@item.CodVendedor">@item.CodVendedor - @item.NomVendedor</option>
+                                <option value="@item.CodVendedor">@item.CodVendedor - @item.NomVendedor</option>
                             }
                         </select>
                     </div>

@@ -14,6 +14,7 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
     {
         private readonly ICrudApi<ComprasReportes, int> service;
         private readonly ICrudApi<ProductosViewModel, string> productos;
+        private readonly ICrudApi<ProveedoresViewModel, string> serviceP;
         [BindProperty(SupportsGet = true)]
         public ParametrosFiltro filtro { get; set; }
 
@@ -23,10 +24,14 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
         [BindProperty]
         public ProductosViewModel[] Productos { get; set; }
 
-        public ComprasModel(ICrudApi<ComprasReportes, int> service, ICrudApi<ProductosViewModel, string> productos)
+        [BindProperty]
+        public ProveedoresViewModel[] Proveedores { get; set; }
+
+        public ComprasModel(ICrudApi<ComprasReportes, int> service, ICrudApi<ProductosViewModel, string> productos, ICrudApi<ProveedoresViewModel, string> serviceP)
         {
             this.service = service;
             this.productos = productos;
+            this.serviceP = serviceP;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -44,6 +49,7 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
 
                 EncVtas = await service.ObtenerCompras(filtro);
                 Productos = await productos.ObtenerLista("");
+                Proveedores = await serviceP.ObtenerLista("");
                 return Page();
             }
             catch (Exception ex)

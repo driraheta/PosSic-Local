@@ -36,5 +36,6 @@ namespace Sicsoft.Checkin.Web.Models
         public decimal? MtoCompras { get; set; }
 
         public DateTime? FecUltCompra { get; set; }
+        public int DiasCredito { get; set; }
     }
 }

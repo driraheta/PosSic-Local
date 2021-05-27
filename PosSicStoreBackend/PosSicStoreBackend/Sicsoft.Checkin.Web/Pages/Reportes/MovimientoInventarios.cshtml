@@ -165,9 +165,10 @@
                     <div class="col-sm-6">
                         <select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">
                             <option value="NULL" selected>-Tipo Movimiento-</option>
-                            @foreach (var item in Model.CodMov)
+                            @foreach (var item in Model.CodMov.Where(a => a.Modifica == true).ToList())
                             {
-                                <option value="@item.CodMov"> @item.CodMov -  @item.NomMov</option>
+                                @*<option value="@item.CodMov"> @item.CodMov -  @item.NomMov</option>*@
+                                <option value="@item.CodMov"> @item.NomMov</option>
                             }
                         </select>
                     </div>

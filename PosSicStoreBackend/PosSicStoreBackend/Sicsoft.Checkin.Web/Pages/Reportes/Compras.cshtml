@@ -152,20 +152,33 @@
 
 
 
-                    
+
                     <div class="col-sm-6">
                         <input class="form-control" id="FecInicial" type="date" asp-for="filtro.FechaInicial" />
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" id="FecFinal" type="date" asp-for="filtro.FechaFinal" />
                     </div>
-                   
+
 
 
                     <div class="col-sm-12">
                         <br />
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <select asp-for="filtro.CodProveedor" id="CodProv" class="form-control  mi-selector">
+                                    <option value="00" selected>-Seleccione Proveedor-</option>
+                                    @foreach (var item in Model.Proveedores)
+                                    {
+                                        <option value="@item.CodProveedor">@item.CodProveedor - @item.NomProveedor</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
                         <div class="form-group row">
                             <div class="col-sm-5">
 
@@ -179,7 +192,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="form-group row">
                             <div class="col-sm-5">
 
@@ -193,6 +206,7 @@
                             </div>
                         </div>
                     </div>
+
 
 
 

@@ -229,6 +229,7 @@
                     <tr>
 
                         <td align="center" style="width: 25%;"><h3>No. Compra</h3></td>
+                        <td align="center" style="width: 50%;"><h3>Fecha</h3></td>
                         <td align="center" style="width: 50%;"><h3>Proveedor</h3></td>
                         <td align="center" style="width: 50%;"><h3>Subtotal</h3></td>
                         <td align="center" style="width: 50%;"><h3>Descuento</h3></td>
@@ -249,14 +250,19 @@
                     <tr>
 
                         <td align="center" style="padding-top:15px;">
-                            <a asp-page="Editar" asp-route-id="@item.NumCompra" asp-route-codProv="@item.CodProveedor"  style="font-size:15px; text-decoration: underline;"> @item.NumCompra</a>
+                            <a asp-page="Editar" asp-route-id="@item.NumCompra" asp-route-codProv="@item.CodProveedor" style="font-size:15px; text-decoration: underline;"> @item.NumCompra</a>
                         </td>
 
+                        <td align="center" style="padding-top:15px;">
+                            <p style="font-size:15px;">
+                                @item.FechaCompra.ToShortDateString()
+                            </p>
+                        </td>
 
                         @if (Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).Count() > 0)
                         {
                             <td align="center" style="padding-top:15px;">
-                              <p style="font-size:15px;">
+                                <p style="font-size:15px;">
                                     @Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault().NomProveedor
                                 </p>
                             </td>
@@ -265,7 +271,6 @@
                         {
                             <td align="center" style="padding-top:15px;">
                                 <h3>
-                                    
                                 </h3>
                             </td>
                         }
@@ -275,11 +280,11 @@
                         <td align="right" style="padding-top:15px;"><h3> @decimal.Round(item.TotalCompra, 2).ToString("N", formato) </h3></td>
                         @if (((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == ClaimTypes.Role).Select(s1 => s1.Value).FirstOrDefault().Contains("25"))
                         {
-                    <td align="center" style="padding-top:15px;">
-               
-                        <a onclick="javascript: onClickModal('@item.NumCompra', '@item.CodProveedor')" class="fa fa-trash icono"></a>
+                            <td align="center" style="padding-top:15px;">
 
-                    </td>
+                                <a onclick="javascript: onClickModal('@item.NumCompra', '@item.CodProveedor')" class="fa fa-trash icono"></a>
+
+                            </td>
                         }
                     </tr>
 

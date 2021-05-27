@@ -28,5 +28,13 @@ namespace Sicsoft.Checkin.Web.Models
         public bool Detallado { get; set; } = false;
         public int FacturaInicial { get; set; } = 0;
         public int FacturaFinal { get; set; } = 0;
+
+        //sustituye codigo
+        public string CodCaja { get; set; }
+        //sustituye codProveedor
+        public string CodCajero { get; set; }
+        //sustituye texto
+        public string CodVendedor { get; set; }
+
     }
 }

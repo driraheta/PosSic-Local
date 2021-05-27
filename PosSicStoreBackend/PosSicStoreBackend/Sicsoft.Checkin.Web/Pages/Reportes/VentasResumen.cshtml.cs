@@ -55,7 +55,7 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
             try
             {
                 DateTime time = new DateTime();
-
+                
                 if (filtro.FechaFinal.Date == time.Date)
                 {
                     filtro.FechaInicial = DateTime.Now.AddMonths(-1);

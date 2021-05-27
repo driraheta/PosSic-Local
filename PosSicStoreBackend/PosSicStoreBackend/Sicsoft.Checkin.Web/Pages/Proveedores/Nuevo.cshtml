@@ -156,12 +156,22 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-4">
-                            <label asp-for="Proveedor.Fax" class="col-form-label">Fax:</label>
+                            <label asp-for="Proveedor.Fax" data-mask="____-____" class="col-form-label">Fax:</label>
 
                         </div>
                         <div class="col-sm-6">
-                            <input asp-for="Proveedor.Fax" placeholder="Fax del proveedor" data-mask="____-____" class="form-control">
+                            <input asp-for="Proveedor.Fax" placeholder="Fax del proveedor" class="form-control">
                             <span asp-validation-for="Proveedor.Fax" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            <label asp-for="Proveedor.DiasCredito" class="col-form-label">Días de Credito:</label>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <input asp-for="Proveedor.DiasCredito" placeholder="Días de Credito" class="form-control">
+                            <span asp-validation-for="Proveedor.DiasCredito" class="text-danger"></span>
                         </div>
                     </div>
                 </div>

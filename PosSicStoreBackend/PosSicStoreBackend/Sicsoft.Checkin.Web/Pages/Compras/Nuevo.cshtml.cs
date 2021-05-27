@@ -206,5 +206,22 @@ namespace Sicsoft.Checkin.Web.Pages.Compras
             }
         }
 
+
+        public async Task<IActionResult> OnGetProveedor(string id)
+        {
+            try
+            {
+                var proveedor = await proveedores.ObtenerPorId(id);
+                return new JsonResult(proveedor);
+            }
+            catch (ApiException ex)
+            {
+                Errores error = JsonConvert.DeserializeObject<Errores>(ex.Content.ToString());
+                ModelState.AddModelError(string.Empty, error.Message);
+
+                return new JsonResult(error);
+            }
+        }
+
     }
 }
