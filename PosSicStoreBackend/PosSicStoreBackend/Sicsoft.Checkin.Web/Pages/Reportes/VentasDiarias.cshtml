@@ -163,6 +163,10 @@
                 $("#Detallado").hide();
             }
         }
+
+        function checkAnuladas() {
+            
+        }
     </script>
 }
 <link rel="stylesheet"  href="~/css/reportes.css"/>
@@ -223,7 +227,7 @@
                     <div class="col-md-2">
                         <label class="checkbox" style="text-decoration: none; font-size: 13px;">
                             Anuladas
-                            <input type="checkbox" id="anulada" asp-for="filtro.Anulada" />
+                            <input type="checkbox" id="anulada" asp-for="filtro.Anulada" onchange="javascript: checkAnuladas()" />
                             <span class="check"></span>
                         </label>
 
@@ -313,59 +317,94 @@
 
                         @foreach (var item in Model.EncVtas)
                         {
-                        <tr>
+                            <tr>
 
-                            <td align="center" style=" ">
-                                <p style="font-size:15px; font-weight: bold;"> @item.NumFactura</p>
-                            </td>
-                            <td align="center" style=""><p style="font-size:15px;"> @item.FecFactura.Value.ToString("dd/MM/yyyy")</p></td>
-                            <td align="center" style=""><p style="font-size:15px;"> @item.Cedula</p></td>
-                            @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
-                            {
-                                <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
-                            }
-                            else
-                            {
-                                <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
-                            }
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(item.SubTotal, 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(item.Descuento, 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((item.Descuento > 0 && item.SubTotal > 0 ? ((item.Descuento / item.SubTotal) * 100) :0), 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((item.ImptoVentas), 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((item.Total), 2).ToString("N", formato) </p></td>
+                                <td align="center" style=" ">
+                                    <p style="font-size:15px; font-weight: bold;"> @item.NumFactura</p>
+                                </td>
+                                <td align="center" style=""><p style="font-size:15px;"> @item.FecFactura.Value.ToString("dd/MM/yyyy")</p></td>
+                                <td align="center" style=""><p style="font-size:15px;"> @item.Cedula</p></td>
+                                @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
+                                {
+                                    <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
+                                }
+                                else
+                                {
+                                    <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
+                                }
 
 
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.SubTotal, 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.Descuento, 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Descuento > 0 && item.SubTotal > 0 ? ((item.Descuento / item.SubTotal) * 100) : 0), 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.ImptoVentas), 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Total), 2).ToString("N", formato)) </p></td>
 
 
-                        </tr>
+
+
+                            </tr>
 
                         }
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td align="center" style="">
-                                <p style="font-size: 15px; font-weight: 600;">Total:</p>
-                            </td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.SubTotal), 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Descuento), 2).ToString("N", formato) </p></td>
-                            <td></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.ImptoVentas), 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td align="center" style="">
-                                <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
-                            </td>
-                            <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Sum(a => a.SubTotal) - Model.EncVtas.Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">   </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                            <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                        </tr>
+                        @if (Model.CheckAnuladas)
+                        {
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td align="center" style="">
+                                    <p style="font-size: 15px; font-weight: 600;">Total:</p>
+                                </td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.SubTotal), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Descuento), 2).ToString("N", formato) </p></td>
+                                <td></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.ImptoVentas), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td align="center" style="">
+                                    <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
+                                </td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Sum(a => a.SubTotal) - Model.EncVtas.Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">   </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td align="center" style="">
+                                    <p style="font-size: 15px; font-weight: 600;">Total:</p>
+                                </td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.SubTotal), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Descuento), 2).ToString("N", formato) </p></td>
+                                <td></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.ImptoVentas), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Total), 2).ToString("N", formato) </p></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td align="center" style="">
+                                    <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
+                                </td>
+                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Where(a => a.Anulada == false).Sum(a => a.SubTotal) - Model.EncVtas.Where(a => a.Anulada == false).Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">   </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                            </tr>
+                        }
+
                     </tbody>
                 </table>
 

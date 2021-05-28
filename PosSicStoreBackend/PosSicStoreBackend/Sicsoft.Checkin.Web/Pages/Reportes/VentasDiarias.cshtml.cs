@@ -38,6 +38,8 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
         public ProductosViewModel[] Productos { get; set; }
         [BindProperty]
         public ClientesViewModel[] Clientes { get; set; }
+        [BindProperty]
+        public bool CheckAnuladas { get; set; }
 
         public VentasDiariasModel(ICrudApi<CajasViewModel, string> cajas, ICrudApi<ClientesViewModel, string> clientes, ICrudApi<CajerosViewModel, string> cajeros,ICrudApi<EncVtasViewModel, int> service, ICrudApi<ProductosViewModel, string> productos ,ICrudApi<VendedorViewModel, string> vendedor)
         {
@@ -59,6 +61,10 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                 {
                     filtro.FechaInicial = DateTime.Now.AddMonths(-1);
                     filtro.FechaFinal = DateTime.Now;
+                }
+                if(filtro.Anulada)
+                {
+                    CheckAnuladas = true;
                 }
 
                 EncVtas = await service.ObtenerLista(filtro);
