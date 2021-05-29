@@ -58,7 +58,7 @@
                 height: 'resolve'
             });
 
-            checkDetallado();
+            checkDetallado(document.getElementById("cierreCaja"));
 
         });
 
@@ -146,21 +146,45 @@
             link.href = uri + base64(format(template, ctx));
             link.click();
         }
-        function checkDetallado() {
-            console.log("ingreso");
-            var checkbox1 = document.getElementById("cierreTarjetas");
-            var checkbox2 = document.getElementById("cierreCaja");
-            if (checkbox1.checked) {
-                checkbox2.checked = false;
-                checkbox1.checked = true;
-                $("#noDetallado").hide();
-                $("#Detallado").show();
-            } else {
-                checkbox2.checked = true;
-                checkbox1.checked = false;
+        function checkDetallado(chk) {
+            //var checkCaja = document.getElementById("cierreCaja");
+            //var checkTarjetas = document.getElementById("cierreTarjetas");            
+
+            if (chk.checked && chk.id == 'cierreCaja') {
                 $("#noDetallado").show();
                 $("#Detallado").hide();
+                document.getElementById("cierreTarjetas").checked = false;
+            } else if (!chk.checked && chk.id == 'cierreCaja') {
+                $("#noDetallado").hide();
+            } else if (chk.checked && chk.id == 'cierreTarjetas') {
+                $("#noDetallado").hide();
+                $("#Detallado").show();
+                document.getElementById("cierreCaja").checked = false;
+            } else if (!chk.checked && chk.id == 'cierreTarjetas') {
+                $("#Detallado").hide();
             }
+
+
+            //if (checkCaja.checked) {
+            //    $("#noDetallado").show();
+            //    $("#Detallado").hide();
+            //    document.getElementById("cierreTarjetas").checked = false;
+            //} else if (checkTarjetas.checked) {
+            //    $("#noDetallado").hide();
+            //    $("#Detallado").show();
+            //    document.getElementById("cierreCaja").checked = false;
+            //}
+
+            //if (checkTarjetas.checked) {
+            //    checkCaja.checked = false;
+            //    //checkbox1.checked = true;
+            //    $("#noDetallado").hide();
+            //    $("#Detallado").show();                
+            //} else {
+            //    //checkbox2.checked = true;
+            //    checkTarjetas.checked = true;
+                
+            //}
         }
     </script>
 }
@@ -188,14 +212,14 @@
                     <div class="col-sm-4">
                         <label class="checkbox" style="text-decoration: none; font-size: 13px;">
                             Cierre Caja
-                            <input type="checkbox" id="cierreCaja" onchange="javascript: checkDetallado();" />
+                            <input type="checkbox" id="cierreCaja" onchange="javascript: checkDetallado(this);" checked="checked" />
                             <span class="check"></span>
                         </label>
                     </div>
                     <div class="col-sm-4">
                         <label class="checkbox" style="text-decoration: none; font-size: 13px;">
                             Cierre Tarjetas
-                            <input type="checkbox" id="cierreTarjetas" onchange="javascript: checkDetallado();" />
+                            <input type="checkbox" id="cierreTarjetas" onchange="javascript: checkDetallado(this);" />
                             <span class="check"></span>
                         </label>
                     </div>
@@ -374,9 +398,43 @@
                     <div class="html2pdf__page-break"></div>
                 }
 
-
                 i++;
             }
+
+            @if (Model.EncVtas.Length > 0)
+            {
+                <div id="totalesGenerales">
+                    <div class="row" style="justify-content: left;">
+                        <h2 style="margin-left: 30%;">Totales Generales</h2>
+                    </div>
+                    <div class="row" style="justify-content: center;">
+                        <table style="border: none; width: 40%; height: 36px;" border="0">
+                            <tr>
+                                <td align="left" style=""><b> Transacciones:</b></td>
+                                <td align="right"><b>@Model.EncVtas.Length.ToString("N", formato)</b></td>
+                            </tr>
+                            <tr>
+                                <td align="left" style=""><b>Venta Neta:</b></td>
+                                <td align="right"><b>@decimal.Round(Model.EncVtas.Sum(a => a.VentaNeta), 2).ToString("N", formato)</b></td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style=""><b>Impuesto Venta:</b></td>
+                                <td align="right"><b>@decimal.Round(Model.EncVtas.Sum(a => a.ImpuestoVenta), 2).ToString("N", formato)</b></td>
+
+                            </tr>
+                            <tr>
+                                <td align="left" style="">Venta bruta:</td>
+                                <td align="right">@decimal.Round(Model.EncVtas.Sum(a => a.VentaBruta), 2).ToString("N", formato)</td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            }
+
+
+
 
 
         </div>

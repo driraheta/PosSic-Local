@@ -54,7 +54,7 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     
                     filtro.FechaInicial = DateTime.Now;
                 }
-                EncVtas = await service.ObtenerCierre(filtro);
+                EncVtas = await service.ObtenerCierre(filtro);                
                 Cajas = await cajas.ObtenerLista("");
                 Cajeros = await cajeros.ObtenerLista("");
                 EncVtas2 = await service2.ObtenerCierreTarjetas(filtro);
