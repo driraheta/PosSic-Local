@@ -62,11 +62,32 @@
 
         });
 
+        function GetFiltersReport() {
+            var selectCaja = $("#CodCaja option:selected")
+            var selectCajero = $("#CodCajero option:selected")
+            var selectVendedor = $("#CodVend option:selected") 
+            var item = "";
+            item += '<p style="text-align: left; ">'
+            if (selectCaja.val() !== "NULL") {
+                item += '<strong>Caja</strong>: ' + selectCaja.text() + ' ';
+            }
+            if (selectCajero.val() !== "NULL") {
+                item += '<strong>Cajero</strong>: ' + selectCajero.text() + ' ';
+            }
+            if (selectVendedor.val() !== "NULL") {
+                item += '<strong>Vendedor</strong>: ' + selectVendedor.text() + ' ';
+            }
+            item += ' </p>';
+
+            return item;
+        }
+
         function reportePdf() {
             var checkbox1 = document.getElementById("divDetallado");
 
             var combo = document.getElementById("CodVend");
-            var Proveedor = combo.options[combo.selectedIndex].text;
+            var Proveedor = combo.options[combo.selectedIndex].text;                   
+
             var item = "";
             item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
             item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
@@ -74,11 +95,14 @@
             item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Ventas Diarias</b></p>';
             item += '<br>';
             item += '<p style="text-align: left; "><strong>Fechas</strong>: ' + $("#FecInicial").val() + ' - ' + $("#FecFinal").val() + '</p>';
+            item += '<br>';
+            item += GetFiltersReport();
 
-            if (Proveedor != "-Seleccione Vendedor-") {
-                item += '<p style="text-align: left; "><strong>Vendedor</strong>: ' + Proveedor + '</p>';
-                item += '<br>';
-            }
+
+            //if (Proveedor != "-Seleccione Vendedor-") {
+            //    item += '<p style="text-align: left; "><strong>Vendedor</strong>: ' + Proveedor + '</p>';
+            //    item += '<br>';
+            //}
 
             if (checkbox1.checked) {
              
@@ -126,9 +150,10 @@
             // $("#tlbIndexDash1").tableExport();
             var table = $(".table-responsive");
             var html = table.html();
+            var headerFilters = GetFiltersReport();
             var htmls = "";
             var uri = 'data:application/vnd.ms-Excel;base64,';
-            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><header>{filters}</header><table>{table}</table></body></html>';
             var base64 = function (s) {
                 return window.btoa(unescape(encodeURIComponent(s)))
             };
@@ -143,7 +168,8 @@
 
             var ctx = {
                 worksheet: 'reporte',
-                table: htmls
+                filters: headerFilters,
+                table: htmls                
             }
 
 
@@ -301,14 +327,15 @@
                         <tr>
 
                             <td align="center" style="width: 10%;"><h3>Factura</h3></td>
-                            <td align="center" style="width: 10%;"><h3>Fecha</h3></td>
+                            <td align="center" style="width: 15%;"><h3>Fecha</h3></td>
                             <td align="center" style="width: 15%;"><h3>Cédula</h3></td>
-                            <td align="center" style="width: 40%;"><h3>Cliente</h3></td>
+                            <td align="center" style="width: 25%;"><h3>Cliente</h3></td>
                             <td align="center" style="width: 5%;"><h3>SubTotal</h3></td>
                             <td align="center" style="width: 5%;"><h3>Descuento</h3></td>
                             <td align="center" style="width: 5%;"><h3>%</h3></td>
                             <td align="center" style="width: 5%;"><h3>Impuesto</h3></td>
                             <td align="center" style="width: 5%;"><h3>Total</h3></td>
+                            <td align="center" style="width: 10%;"><h3>Anulada</h3></td>
 
                         </tr>
 
@@ -317,33 +344,33 @@
 
                         @foreach (var item in Model.EncVtas)
                         {
-                            <tr>
+                        <tr>
 
-                                <td align="center" style=" ">
-                                    <p style="font-size:15px; font-weight: bold;"> @item.NumFactura</p>
-                                </td>
-                                <td align="center" style=""><p style="font-size:15px;"> @item.FecFactura.Value.ToString("dd/MM/yyyy")</p></td>
-                                <td align="center" style=""><p style="font-size:15px;"> @item.Cedula</p></td>
-                                @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
-                                {
-                                    <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
-                                }
-                                else
-                                {
-                                    <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
-                                }
-
-
-                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.SubTotal, 2).ToString("N", formato)) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.Descuento, 2).ToString("N", formato)) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Descuento > 0 && item.SubTotal > 0 ? ((item.Descuento / item.SubTotal) * 100) : 0), 2).ToString("N", formato)) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.ImptoVentas), 2).ToString("N", formato)) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Total), 2).ToString("N", formato)) </p></td>
+                            <td align="center" style=" ">
+                                <p style="font-size:15px; font-weight: bold;"> @item.NumFactura</p>
+                            </td>
+                            <td align="center" style=""><p style="font-size:12px;"> @item.FecFactura.Value.ToString("dd/MM/yyyy HH:mm")</p></td>
+                            <td align="center" style=""><p style="font-size:15px;"> @item.Cedula</p></td>
+                            @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
+                            {
+                                <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
+                            }
+                            else
+                            {
+                                <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
+                            }
 
 
+                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.SubTotal, 2).ToString("N", formato)) </p></td>
+                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.Descuento, 2).ToString("N", formato)) </p></td>
+                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Descuento > 0 && item.SubTotal > 0 ? ((item.Descuento / item.SubTotal) * 100) : 0), 2).ToString("N", formato)) </p></td>
+                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.ImptoVentas), 2).ToString("N", formato)) </p></td>
+                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Total), 2).ToString("N", formato)) </p></td>
+                            <td align="center" style=""><p style="font-size:12px;"> @item.CodCajero-@item.MotivoAnulacion </p></td>
 
 
-                            </tr>
+
+                        </tr>
 
                         }
                         @if (Model.CheckAnuladas)
