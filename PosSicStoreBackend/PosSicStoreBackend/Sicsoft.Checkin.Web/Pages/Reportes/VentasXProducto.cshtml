@@ -62,9 +62,46 @@
 
         });
 
+        function GetFiltersReport() {
+            var linea = $("#CodLinea option:selected")
+            var cajero = $("#CodCajero option:selected")
+            var vendedor = $("#CodVend option:selected")
+            var FechaIni = $("#FecInicial")
+            var FechaFin = $("#FecFinal")
+            var CodProInicial = $("#CodProInicial option:selected")
+            var CodProFinal = $("#CodProFinal option:selected")
+
+            var item = "";
+            item += '<p style="text-align: left; ">'
+            if (linea.val() !== "NULL") {
+                item += '<strong>Línea</strong>: ' + linea.text() + ' ';
+            }
+            if (cajero.val() !== "NULL") {
+                item += '<strong>Cajero</strong>: ' + cajero.text() + ' ';
+            }
+            if (vendedor.val() !== "NULL") {
+                item += '<strong>Vendedor</strong>: ' + vendedor.text() + ' ';
+            }
+            if (FechaIni.val() !== "NULL") {
+                item += '<strong>Fecha Inicio</strong>: ' + FechaIni.val() + ' ';
+            }
+            if (FechaFin.val() !== "NULL") {
+                item += '<strong>Fecha Fin</strong>: ' + FechaFin.val() + ' ';
+            }
+            if (CodProInicial.val() !== "NULL") {
+                item += '<strong>CodProInicial</strong>: ' + CodProInicial.text() + ' ';
+            }
+            if (CodProFinal.val() !== "NULL") {
+                item += '<strong>CodProFinal</strong>: ' + CodProFinal.text() + ' ';
+            }
+            item += ' </p>';
+
+            return item;
+        }
+
         function reportePdf() {
 
-
+            var checkbox1 = document.getElementById("divDetallado");
             var combo = document.getElementById("CodVend");
             var Proveedor = combo.options[combo.selectedIndex].text;
             var item = "";
@@ -73,12 +110,13 @@
             item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
             item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Ventas Diarias</b></p>';
             item += '<br>';
-            item += '<p style="text-align: left; "><strong>Fechas</strong>: ' + $("#FecInicial").val() + ' - ' + $("#FecFinal").val() + '</p>';
+            //item += '<p style="text-align: left; "><strong>Fechas</strong>: ' + $("#FecInicial").val() + ' - ' + $("#FecFinal").val() + '</p>';
+            item += GetFiltersReport();
 
-            if (Proveedor != "-Seleccione Vendedor-") {
-                item += '<p style="text-align: left; "><strong>Vendedor</strong>: ' + Proveedor + '</p>';
-                item += '<br>';
-            }
+            //if (Proveedor != "-Seleccione Vendedor-") {
+            //    item += '<p style="text-align: left; "><strong>Vendedor</strong>: ' + Proveedor + '</p>';
+            //    item += '<br>';
+            //}
 
             if (checkbox1.checked) {
 
@@ -127,6 +165,7 @@
 
         }
         function Excel() {
+            var checkbox1 = document.getElementById("divDetallado");
             // $("#tlbIndexDash1").tableExport();
             if (!checkbox1.checked) {
                 var table = $("#noDetallado");
@@ -136,8 +175,9 @@
 
             var html = table.html();
             var htmls = "";
+            var headerFilters = GetFiltersReport();
             var uri = 'data:application/vnd.ms-Excel;base64,';
-            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><header>{filters}</header><table>{table}</table></body></html>';
             var base64 = function (s) {
                 return window.btoa(unescape(encodeURIComponent(s)))
             };
@@ -152,6 +192,7 @@
 
             var ctx = {
                 worksheet: 'reporte',
+                filters: headerFilters,
                 table: htmls
             }
 
@@ -191,7 +232,7 @@
 
 
                     <div class="col-sm-4">
-                        <select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">
+                        <select asp-for="filtro.Codigo" id="CodLinea" class="form-control  mi-selector">
                             <option value="NULL" selected>-Seleccione Línea-</option>
                             @foreach (var item in Model.Lineas)
                             {
@@ -231,7 +272,7 @@
                         <br />
                     </div>
                     <div class="col-sm-6">
-                        <select asp-for="filtro.CodProInicial" id="CodCaja" class="form-control  mi-selector">
+                        <select asp-for="filtro.CodProInicial" id="CodProInicial" class="form-control  mi-selector">
                             <option value="NULL" selected>-Producto Inicial-</option>
                             @foreach (var item in Model.Productos.Where(a => a.CodPro != "00000").ToList())
                             {
@@ -240,7 +281,7 @@
                         </select>
                     </div>
                     <div class="col-sm-6">
-                        <select asp-for="filtro.CodProFinal" id="CodCaja" class="form-control  mi-selector">
+                        <select asp-for="filtro.CodProFinal" id="CodProFinal" class="form-control  mi-selector">
                             <option value="NULL" selected>-Producto Final-</option>
                             @foreach (var item in Model.Productos.Where(a => a.CodPro != "00000").ToList())
                             {
