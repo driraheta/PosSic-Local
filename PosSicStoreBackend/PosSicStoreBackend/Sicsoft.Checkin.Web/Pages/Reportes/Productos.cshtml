@@ -49,6 +49,26 @@
 
         });
 
+        function GetFiltersReport() {
+            var prove = $("#CodProv option:selected")
+            var linea1 = $("#CodLineaIni option:selected")
+            var linea2 = $("#CodLineaFinal option:selected")
+            var item = "";
+            item += '<p style="text-align: left; ">'
+            if (prove.val() !== "NULL") {
+                item += '<strong>Proveedor</strong>: ' + prove.text() + ' ';
+            }
+            if (linea1.val() !== "NULL") {
+                item += '<strong>Línea Inicial</strong>: ' + linea1.text() + ' ';
+            }
+            if (linea2.val() !== "NULL") {
+                item += '<strong>Línea Final</strong>: ' + linea2.text() + ' ';
+            }
+            item += ' </p>';
+
+            return item;
+        }
+
         function reportePdf() {
             var combo = document.getElementById("CodProv");
             var Proveedor = combo.options[combo.selectedIndex].text;
@@ -58,9 +78,10 @@
             item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
             item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Productos</b></p>';
             item += '<br>';
-            if (Proveedor != "00") {
-                item += '<p style="text-align: left; "><strong>Proveedor</strong>: ' + Proveedor + '</p>';
-            }
+            item += GetFiltersReport();
+            //if (Proveedor != "00") {
+            //    item += '<p style="text-align: left; "><strong>Proveedor</strong>: ' + Proveedor + '</p>';
+            //}
             item += $(".table-responsive").html();
             var opt = {
                 margin: [10, 5, 15, 5],
@@ -83,8 +104,9 @@
             var table = $(".table-responsive");
             var html = table.html();
             var htmls = "";
+            var headerFilters = GetFiltersReport();
             var uri = 'data:application/vnd.ms-Excel;base64,';
-            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><header>{filters}</header><table>{table}</table></body></html>';
             var base64 = function (s) {
                 return window.btoa(unescape(encodeURIComponent(s)))
             };
@@ -99,6 +121,7 @@
 
             var ctx = {
                 worksheet: 'Reporte Productos',
+                filters: headerFilters,
                 table: htmls
             }
 
@@ -126,7 +149,7 @@
                 <div class="row">
                     <div class="col-sm-3">
                         <select asp-for="filtro.CodProveedor" id="CodProv" class="form-control  mi-selector">
-                            <option value="00" selected>-Seleccione Proveedor-</option>
+                            <option value="NULL">-Seleccione Proveedor-</option>
                             @foreach (var item in Model.Proveedores)
                             {
                                 <option value="@item.CodProveedor">@item.CodProveedor - @item.NomProveedor</option>
@@ -135,8 +158,8 @@
                     </div>
 
                     <div class="col-sm-3">
-                        <select asp-for="filtro.LineaInicial" class="form-control  mi-selector">
-                            <option value="00" selected>-Seleccione Linea Inicial-</option>
+                        <select asp-for="filtro.LineaInicial" class="form-control  mi-selector" id="CodLineaIni">
+                            <option value="NULL">-Seleccione Linea Inicial-</option>
                             @foreach (var item in Model.Lineas)
                             {
                                 <option value="@item.CodLinea">@item.CodLinea - @item.NomLinea</option>
@@ -144,8 +167,8 @@
                         </select>
                     </div>
                     <div class="col-sm-3">
-                        <select asp-for="filtro.LineaFinal" class="form-control  mi-selector">
-                            <option value="00" selected>-Seleccione Linea Final-</option>
+                        <select asp-for="filtro.LineaFinal" class="form-control  mi-selector" id="CodLineaFinal">
+                            <option value="NULL">-Seleccione Linea Final-</option>
                             @foreach (var item in Model.Lineas)
                             {
                                 <option value="@item.CodLinea">@item.CodLinea - @item.NomLinea</option>
