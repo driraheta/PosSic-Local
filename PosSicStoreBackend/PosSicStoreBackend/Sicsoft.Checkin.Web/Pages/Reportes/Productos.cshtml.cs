@@ -36,9 +36,17 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
         public async Task<IActionResult> OnGetAsync()
         {
             try
-            {
+            {                
                 Proveedores = await serviceP.ObtenerLista("");
-                Producto = await service.ObtenerLista(filtro);
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    Producto = await service.ObtenerLista(filtro);
+                }
+                else
+                {
+                    Producto = new ProductosViewModel[0];
+                }
+                
                 Lineas = await lineas.ObtenerLista("");
                 return Page();
             }

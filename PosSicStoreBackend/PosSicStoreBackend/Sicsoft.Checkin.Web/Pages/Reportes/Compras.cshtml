@@ -31,8 +31,10 @@
     formato.CurrencyGroupSeparator = ",";
     formato.NumberDecimalSeparator = ".";
 
-    decimal Descuento = 0;
-    decimal Impuesto = 0;
+    decimal DescuentoFila = 0;
+    decimal ImpuestoFila = 0;
+    decimal DescuentoImpuestoFila = 0;
+    decimal TotalFila = 0;
 
 }
 @section TitleAction{
@@ -235,10 +237,8 @@
 
 
         <div id="noDetallado">
-            @{
-                int i = 0;
-                var general = Model.EncVtas.ToList();
-            }
+            @{ int i = 0;
+                var general = Model.EncVtas.ToList(); }
             @foreach (var item2 in Model.EncVtas.OrderBy(a => a.NumCompra).ToList())
             {
                 <div class="row">
@@ -262,53 +262,36 @@
 
                             <th align="center" style="width: 10%;">Código</th>
                             <th align="center" style="width: 40%;">Descripción</th>
-                            <th align="center" style="width: 15%;">Unidades</th>
+                            <th align="center" style="width: 10%;">Unidades</th>
 
-                            <th align="center" style="width: 15%;">Costo</th>
+                            <th align="center" style="width: 10%;">Costo</th>
                             <th align="center" style="width: 10%;">Descuento</th>
-                            <th align="center" style="width: 10%;">Impuestos</th>
-                            <th align="center" style="width: 15%;">Total</th>
+                            <th align="center" style="width: 10%;">Impuesto</th>
+                            <th align="center" style="width: 10%;">Total</th>
 
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in item2.DetCompras)
                         {
+                            <tr>
 
-
-                        <tr>
-
-                            <td align="left" style=" ">
-                                <p style="font-size:12px; "> @item.CodPro</p>
-                            </td>
-                            <td align="left" style=" "><p style="font-size:12px; "> @((Model.Productos.Where(a => a.CodPro == item.CodPro).FirstOrDefault() == null ? "" : Model.Productos.Where(a => a.CodPro == item.CodPro).FirstOrDefault().NomPro))</p></td>
-                            <td align="center" style=" "><p style="font-size:12px; "> @Convert.ToInt32(item.Cantidad) </p></td>
-                            <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item.CostoPro, 2).ToString("N", formato) </p></td>                            
-                            
-                            @if ((item.PorDescuento ?? 0) > 0)
-                            {
-                                Descuento = item.PorDescuento ?? 0;
-                            }
-                            @if ((item.ImptoVta ?? 0) > 0)
-                            {
-                                Impuesto = item.PorDescuento ?? 0;
-                            }
-                            <td align="right" style=""><p style="font-size:12px;">  @Descuento.ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:12px;">  @Impuesto.ToString("N", formato) </p></td>
-                            <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.CostoPro * item.Cantidad) - ((item.Cantidad * Descuento) + (item.Cantidad * Impuesto)), 2).ToString("N", formato) </p></td>
+                                <td align="left" style=" ">
+                                    <p style="font-size:12px; "> @item.CodPro</p>
+                                </td>
+                                <td align="left" style=" "><p style="font-size:12px; "> @((Model.Productos.Where(a => a.CodPro == item.CodPro).FirstOrDefault() == null ? "" : Model.Productos.Where(a => a.CodPro == item.CodPro).FirstOrDefault().NomPro))</p></td>
+                                <td align="center" style=" "><p style="font-size:12px; "> @Convert.ToInt32(item.Cantidad) </p></td>
+                                <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item.CostoPro, 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.MontoDescuento ?? 0), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.MontoImpuesto ?? 0), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.CostoPro * item.Cantidad) - ((item.MontoDescuento ?? 0) + (item.MontoImpuesto ?? 0)), 2).ToString("N", formato) </p></td>
 
 
 
 
 
-                        </tr>
-
-
-
-
-
-
-                        }
+                            </tr>
+}
                     <tr>
 
                         <td align="left" style=" ">
@@ -317,9 +300,9 @@
                         <td align="center" style=" "><p style="font-size:12px; font-weight: bold;"> Total:</p></td>
                         <td align="center" style=" "><p style="font-size:12px; "> @Convert.ToInt32(item2.DetCompras.Sum(a => a.Cantidad)) </p></td>
                         <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => a.CostoPro), 2).ToString("N", formato) </p></td>
-                        <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => (a.PorDescuento ?? 0 / a.CostoPro) * 100), 2).ToString("N", formato) </p></td>
-                        <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => a.ImptoVta ?? 0), 2).ToString("N", formato) </p></td>
-                        <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => (a.CostoPro * a.Cantidad) - ((a.CostoPro*a.PorDescuento??0)+a.ImptoVta??0)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style=""><p style="font-size:12px;"> @decimal.Round(item2.DetCompras.Sum(a => (a.MontoDescuento??0)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style=""><p style="font-size:12px;"> @decimal.Round(item2.DetCompras.Sum(a => (a.MontoImpuesto ?? 0)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => (a.CostoPro * a.Cantidad) - ((a.MontoDescuento ?? 0) + (a.MontoImpuesto ?? 0))), 2).ToString("N", formato) </p></td>
 
 
 
@@ -334,12 +317,10 @@
 
                 <p>&nbsp;</p>
 
-                <hr style="border-color: black;" />
-                if (i % 2 == 0)
+                <hr style="border-color: black;" /> if (i % 2 == 0)
                 {
                     <div class="cuidado"></div>
-                    <div class="html2pdf__page-break"></div>
-                }
+                    <div class="html2pdf__page-break"></div>}
 
 
                 i++;
@@ -355,7 +336,7 @@
                         <td align="center" style="width: 40%; "><p style="font-size:12px; font-weight: bold;"> Total General:</p></td>
                         <td align="center" style="width: 15%; "><p style="font-size:12px; "> @Convert.ToInt32(general.Sum(a => a.DetCompras.Sum(c => c.Cantidad))) </p></td>
                         <td align="right" style="width: 15%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => c.CostoPro)), 2).ToString("N", formato) </p></td>
-                        <td align="right" style="width: 15%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c =>  c.CostoPro * c.Cantidad)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style="width: 15%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => (c.CostoPro * c.Cantidad) - ((c.MontoDescuento ?? 0)+(c.MontoImpuesto ?? 0)))), 2).ToString("N", formato) </p></td>
 
 
 

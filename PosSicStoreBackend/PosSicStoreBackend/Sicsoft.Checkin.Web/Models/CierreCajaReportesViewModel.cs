@@ -24,5 +24,6 @@ namespace Sicsoft.Checkin.Web.Models
         public decimal EfectivoF { get; set; }
         public decimal TarjetasF { get; set; }
         public decimal DolaresF { get; set; }
+        public int Transacciones { get; set; }
     }
 }

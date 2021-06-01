@@ -149,7 +149,7 @@
                 <div class="row">
                     <div class="col-sm-3">
                         <select asp-for="filtro.CodProveedor" id="CodProv" class="form-control  mi-selector">
-                            <option value="NULL">-Seleccione Proveedor-</option>
+                            <option value="">-Seleccione Proveedor-</option>
                             @foreach (var item in Model.Proveedores)
                             {
                                 <option value="@item.CodProveedor">@item.CodProveedor - @item.NomProveedor</option>
@@ -159,7 +159,7 @@
 
                     <div class="col-sm-3">
                         <select asp-for="filtro.LineaInicial" class="form-control  mi-selector" id="CodLineaIni">
-                            <option value="NULL">-Seleccione Linea Inicial-</option>
+                            <option value="">-Seleccione Linea Inicial-</option>
                             @foreach (var item in Model.Lineas)
                             {
                                 <option value="@item.CodLinea">@item.CodLinea - @item.NomLinea</option>
@@ -168,7 +168,7 @@
                     </div>
                     <div class="col-sm-3">
                         <select asp-for="filtro.LineaFinal" class="form-control  mi-selector" id="CodLineaFinal">
-                            <option value="NULL">-Seleccione Linea Final-</option>
+                            <option value="">-Seleccione Linea Final-</option>
                             @foreach (var item in Model.Lineas)
                             {
                                 <option value="@item.CodLinea">@item.CodLinea - @item.NomLinea</option>

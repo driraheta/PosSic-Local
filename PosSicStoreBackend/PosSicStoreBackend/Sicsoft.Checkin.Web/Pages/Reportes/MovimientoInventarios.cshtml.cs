@@ -46,7 +46,16 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                 }
                 filtro.FechaFinal = filtro.FechaFinal.AddDays(1);
 
-                EncVtas = await service.ObtenerMovimiento(filtro);
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerMovimiento(filtro);
+                }
+                else
+                {
+                    EncVtas = new MovimientoInventariosReportes[0];
+                }
+
+                
                 Productos = await productos.ObtenerLista("");
                 CodMov = await lineas.ObtenerLista("");
                 return Page();

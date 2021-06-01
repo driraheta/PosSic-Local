@@ -46,7 +46,16 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                 filtro.FechaInicial = DateTime.Now.AddMonths(-1);
                 filtro.FechaFinal = DateTime.Now;
                 }
-                Abonos = await service.ObtenerLista(filtro);
+
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    Abonos = await service.ObtenerLista(filtro);
+                }
+                else
+                {
+                    Abonos = new AbonosViewModel[0];
+                }
+                
                 Clientes = await clientes.ObtenerLista("");
                 Apartados = await apartados.ObtenerLista("");
                 return Page();

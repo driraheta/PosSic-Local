@@ -47,7 +47,15 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                 }
                 filtro.FechaFinal = filtro.FechaFinal.AddDays(1);
 
-                EncVtas = await service.ObtenerCompras(filtro);
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerCompras(filtro);
+                }
+                else
+                {
+                    EncVtas = new ComprasReportes[0];
+                }
+                
                 Productos = await productos.ObtenerLista("");
                 Proveedores = await serviceP.ObtenerLista("");
                 return Page();

@@ -169,5 +169,7 @@ namespace Sicsoft.Checkin.Web.Models
 
         public bool? AbonoApartado { get; set; }
         public List<DetVtasViewModel> Detalle { get; set; }
+
+        public string NomSupervisor { get; set; }
     }
 }

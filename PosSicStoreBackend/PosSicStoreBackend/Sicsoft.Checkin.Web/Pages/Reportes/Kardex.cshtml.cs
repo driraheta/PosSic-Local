@@ -51,9 +51,16 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     filtro.FechaInicial = DateTime.Now.AddMonths(-2);
                     filtro.FechaFinal = DateTime.Now;
                 }
-               
-
-                EncVtas = await service.ObtenerKardez(filtro);
+                
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerKardez(filtro);
+                }
+                else
+                {
+                    EncVtas = new KardexViewModel[0];
+                }
+                
                 Productos = await prods.ObtenerLista("");
                 Movimientos = await mov.ObtenerLista("");
 

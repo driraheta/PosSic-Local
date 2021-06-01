@@ -34,8 +34,15 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
         {
             try
             {
-
-                EncVtas = await service.ObtenerEntradasySalidas(filtro);
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerEntradasySalidas(filtro);
+                }
+                else
+                {
+                    EncVtas = new ReportesProductosViewModel[0];
+                }
+                
                 Lineas = await lineas.ObtenerLista("");
 
 

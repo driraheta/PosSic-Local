@@ -76,12 +76,20 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     filtro.FechaFinal = DateTime.Now;
                 }
                 filtro.FechaFinal = filtro.FechaFinal.AddDays(1);
-                EncVtas = await service.ObtenerListaVentasXProducto(filtro);
-                EncVtas2 = await service2.ObtenerListaVentasXProductoFactura(filtro);
-                var EncVtas1 = EncVtas.GroupBy(a => a.CodLinea);
-                
 
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerListaVentasXProducto(filtro);
+                    EncVtas2 = await service2.ObtenerListaVentasXProductoFactura(filtro);
+                }
+                else
+                {
+                    EncVtas = new VentasXProductoViewModel[0];
+                    EncVtas2 = new VentasProductosFacturas[0];
+                }
                 
+                var EncVtas1 = EncVtas.GroupBy(a => a.CodLinea);
+                                
 
                 Cajas = await cajas.ObtenerLista("");
                 Cajeros = await cajeros.ObtenerLista("");

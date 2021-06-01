@@ -51,6 +51,37 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
             this.clientes = clientes;
         }
 
+        //public async Task<IActionResult> OnGetAsync()
+        //{
+        //    try
+        //    {
+        //        DateTime time = new DateTime();
+
+        //        if (filtro.FechaFinal.Date == time.Date)
+        //        {
+        //            filtro.FechaInicial = DateTime.Now.AddMonths(-1);
+        //            filtro.FechaFinal = DateTime.Now;
+        //        }
+        //        if (filtro.Anulada)
+        //        {
+        //            CheckAnuladas = true;
+        //        }
+
+        //        EncVtas = new EncVtasViewModel[0];
+        //        Cajas = await cajas.ObtenerLista("");
+        //        Cajeros = await cajeros.ObtenerLista("");
+        //        Vendedores = await vendedor.ObtenerLista("");
+        //        Productos = await productos.ObtenerLista("");
+        //        Clientes = await clientes.ObtenerLista("");
+        //        return Page();
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        throw ex;
+        //    }
+        //}
+
         public async Task<IActionResult> OnGetAsync()
         {
             try
@@ -67,7 +98,16 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     CheckAnuladas = true;
                 }
 
-                EncVtas = await service.ObtenerLista(filtro);
+                if(PageContext.HttpContext.Request.Query.Count == 0)
+                {
+                    EncVtas = new EncVtasViewModel[0];
+                }
+                else
+                {
+                    EncVtas = await service.ObtenerLista(filtro);
+                }                
+
+                //EncVtas = await service.ObtenerLista(filtro);
                 Cajas = await cajas.ObtenerLista("");
                 Cajeros = await cajeros.ObtenerLista("");
                 Vendedores = await vendedor.ObtenerLista("");

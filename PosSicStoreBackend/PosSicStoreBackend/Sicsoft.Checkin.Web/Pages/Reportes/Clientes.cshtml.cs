@@ -32,7 +32,15 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
         {
             try
             {
-                Clientes = await service.ObtenerLista(filtro);
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    Clientes = await service.ObtenerLista(filtro);
+                }
+                else
+                {
+                    Clientes = new ClientesViewModel[0];
+                }
+                
                 TiposPrecios = await serviceTiposPrecios.ObtenerLista("");
 
                 return Page();

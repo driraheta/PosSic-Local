@@ -411,7 +411,7 @@
                         <table style="border: none; width: 40%; height: 36px;" border="0">
                             <tr>
                                 <td align="left" style=""><b> Transacciones:</b></td>
-                                <td align="right"><b>@Model.EncVtas.Length.ToString("N", formato)</b></td>
+                                <td align="right"><b>@Model.EncVtas.Sum(a => a.Transacciones)</b></td>
                             </tr>
                             <tr>
                                 <td align="left" style=""><b>Venta Neta:</b></td>

@@ -43,9 +43,16 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
         {
             try
             {
-                
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerHVentas(filtro);
+                }
+                else
+                {
+                    EncVtas = new HistoricoVentasReportes[0];
+                }
 
-                EncVtas = await service.ObtenerHVentas(filtro);
+                
                 Vendedores = await vendedores.ObtenerLista("");
                 var Primero = await hist.ObtenerLista("");
               

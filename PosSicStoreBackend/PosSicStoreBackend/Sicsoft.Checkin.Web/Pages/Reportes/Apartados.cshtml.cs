@@ -50,7 +50,15 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     filtro.FechaFinal = DateTime.Now;
                 }
 
-                Apartados = await service.ObtenerLista(filtro);
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    Apartados = await service.ObtenerLista(filtro);
+                }
+                else
+                {
+                    Apartados = new EncApartadosViewModel[0];
+                }
+                
                 Clientes = await clientes.ObtenerLista("");
                 Vendedores = await vendedor.ObtenerLista("");
                 Productos = await productos.ObtenerLista("");

@@ -60,8 +60,17 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     filtro.FechaInicial = DateTime.Now;
                     filtro.FechaFinal = DateTime.Now;
                 }
-               
-                EncVtas = await service.ObtenerListaVentasXHora(filtro);
+
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerListaVentasXHora(filtro);
+                }
+                else
+                {
+                    EncVtas = new VentasXHoraViewModel[0];
+                }
+
+                
                 Cajas = await cajas.ObtenerLista("");
                 Cajeros = await cajeros.ObtenerLista("");
                 Vendedores = await vendedor.ObtenerLista("");

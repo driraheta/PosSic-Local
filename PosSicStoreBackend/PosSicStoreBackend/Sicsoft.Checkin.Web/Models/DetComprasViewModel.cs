@@ -26,5 +26,8 @@ namespace Sicsoft.Checkin.Web.Models
         public decimal? ImptoVta { get; set; }
 
         public decimal? PorDescuento { get; set; }
+
+        public decimal? MontoDescuento { get; set; }
+        public decimal? MontoImpuesto { get; set; }
     }
 }

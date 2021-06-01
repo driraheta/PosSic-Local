@@ -54,10 +54,20 @@ namespace Sicsoft.Checkin.Web.Pages.Reportes
                     
                     filtro.FechaInicial = DateTime.Now;
                 }
-                EncVtas = await service.ObtenerCierre(filtro);                
+                if (PageContext.HttpContext.Request.Query.Count > 0)
+                {
+                    EncVtas = await service.ObtenerCierre(filtro);
+                    EncVtas2 = await service2.ObtenerCierreTarjetas(filtro);
+                }
+                else
+                {
+                    EncVtas = new CierreCajaReportesViewModel[0];
+                    EncVtas2 = new CierreTarjetasReportes[0];
+                }
+                              
                 Cajas = await cajas.ObtenerLista("");
                 Cajeros = await cajeros.ObtenerLista("");
-                EncVtas2 = await service2.ObtenerCierreTarjetas(filtro);
+                //EncVtas2 = await service2.ObtenerCierreTarjetas(filtro);
                 Tarjetas = await tarjetas.ObtenerLista("");
                 return Page();
             }
