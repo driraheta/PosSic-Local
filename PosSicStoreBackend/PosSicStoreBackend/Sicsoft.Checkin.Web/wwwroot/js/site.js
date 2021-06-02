@@ -175,3 +175,28 @@ function formatoDecimal(numero) {
     return new Intl.NumberFormat("en-US").format(number); //+ decimal;
 }
 
+
+//recibe un objeto con los campos del filtro que deben de evaluarse.
+function FiltrosParaReporte(arreglo) {
+    var text = "";
+    //debugger;
+    if (Array.isArray(arreglo)) {
+        text += '<p style="text-align: left; ">'
+        $.each(arreglo, function (key, item) {
+            //debugger;
+            if (item.prop.is("input")) {
+                if (item.prop.val() !== '') {
+                    text += '<strong>'+item.Nombre+'</strong>: ' + item.prop.val() + ' ';
+                }
+            } else if (item.prop.is('option')) {
+                if (item.prop.val() !== '' && item.prop.val().toLowerCase() !== 'null'
+                    && item.prop.val() !== null) {
+                    text += '<strong>' + item.Nombre + '</strong>: ' + item.prop.text() + ' ';
+                }
+            }
+        })
+    }
+
+    text += ' </p>';
+    return text;
+}

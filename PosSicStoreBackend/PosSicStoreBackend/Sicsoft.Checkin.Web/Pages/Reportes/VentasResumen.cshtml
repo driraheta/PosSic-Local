@@ -63,32 +63,19 @@
         });
 
         function GetFiltersReport() {
+            var arregloObjetos = [];
             var selectCaja = $("#CodCaja option:selected")
             var selectCajero = $("#CodCajero option:selected")
             var selectVendedor = $("#CodVend option:selected")
             var FechaIni = $("#FecInicial")
             var FechaFin = $("#FecFinal")
 
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (selectCaja.val() !== "NULL") {
-                item += '<strong>Caja</strong>: ' + selectCaja.text() + ' ';
-            }
-            if (selectCajero.val() !== "NULL") {
-                item += '<strong>Cajero</strong>: ' + selectCajero.text() + ' ';
-            }
-            if (selectVendedor.val() !== "NULL") {
-                item += '<strong>Vendedor</strong>: ' + selectVendedor.text() + ' ';
-            }
-            if (FechaIni.val() !== "NULL") {
-                item += '<strong>Fecha Inicio</strong>: ' + FechaIni.val() + ' ';
-            }
-            if (FechaFin.val() !== "NULL") {
-                item += '<strong>Fecha Final</strong>: ' + FechaFin.val() + ' ';
-            }
-            item += ' </p>';
-
-            return item;
+            arregloObjetos.push({ Nombre: 'Caja', prop: selectCaja });
+            arregloObjetos.push({ Nombre: 'Cajero', prop: selectCajero });
+            arregloObjetos.push({ Nombre: 'Vendedor', prop: selectVendedor });
+            arregloObjetos.push({ Nombre: 'Fecha Inicio', prop: FechaIni });
+            arregloObjetos.push({ Nombre: 'Fecha Fin', prop: FechaFin });
+            return FiltrosParaReporte(arregloObjetos);
         }
 
         function reportePdf() {

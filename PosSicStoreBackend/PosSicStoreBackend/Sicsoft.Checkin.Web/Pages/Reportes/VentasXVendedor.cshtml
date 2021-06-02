@@ -78,28 +78,17 @@
         });
 
         function GetFiltersReport() {
+            var arregloObjetos = [];
             var selectAnio = $("#Anio option:selected")
             var selectMesIni = $("#MesIni option:selected")
             var selectMesFin = $("#MesFin option:selected")
             var selectVendedor = $("#CodVend option:selected")
 
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (selectAnio.val() !== "NULL") {
-                item += '<strong>Año</strong>: ' + selectAnio.text() + ' ';
-            }
-            if (selectMesIni.val() !== "NULL") {
-                item += '<strong>Mes Inicial</strong>: ' + selectMesIni.text() + ' ';
-            }
-            if (selectMesFin.val() !== "NULL") {
-                item += '<strong>Mes Final</strong>: ' + selectMesFin.text() + ' ';
-            }
-            if (selectVendedor.val() !== "NULL") {
-                item += '<strong>Vendedor</strong>: ' + selectVendedor.text() + ' ';
-            }
-            item += ' </p>';
-
-            return item;
+            arregloObjetos.push({ Nombre: 'Año', prop: selectAnio });
+            arregloObjetos.push({ Nombre: 'Mes Inicio', prop: selectMesIni });
+            arregloObjetos.push({ Nombre: 'Mes Fin', prop: selectMesFin });
+            arregloObjetos.push({ Nombre: 'Vendedor', prop: selectVendedor });
+            return FiltrosParaReporte(arregloObjetos);
         }
 
         function reportePdf() {

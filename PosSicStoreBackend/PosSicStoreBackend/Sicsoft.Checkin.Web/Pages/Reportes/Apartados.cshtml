@@ -62,23 +62,21 @@
         });
 
         function GetFiltersReport() {
-            var select = $("#CodProv option:selected")
+            var arregloObjetos = [];
+            var cliente = $("#CodCliente option:selected")
+            var fecinicial = $("#FecInicial")
+            var fecfinal = $("#FecFinal")
 
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (select.val() !== "NULL") {
-                item += '<strong>Caja</strong>: ' + select.text() + ' ';
-            }
-            
-            item += ' </p>';
-
-            return item;
-        }
+            arregloObjetos.push({ Nombre: 'Cliente', prop: cliente });
+            arregloObjetos.push({ Nombre: 'Fecha Inicial', prop: fecinicial });
+            arregloObjetos.push({ Nombre: 'Fecha Final', prop: fecfinal });
+            return FiltrosParaReporte(arregloObjetos);
+        }        
 
         function reportePdf() {
             var checkbox1 = document.getElementById("divDetallado");
 
-            var combo = document.getElementById("CodProv");
+            var combo = document.getElementById("CodCliente");
             var Proveedor = combo.options[combo.selectedIndex].text;
             var item = "";
             item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
@@ -86,7 +84,7 @@
             item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
             item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Apartados</b></p>';
             item += '<br>';
-            item += '<p style="text-align: left; "><strong>Fechas</strong>: ' + $("#FecInicial").val() + ' - ' + $("#FecFinal").val() + '</p>';
+            //item += '<p style="text-align: left; "><strong>Fechas</strong>: ' + $("#FecInicial").val() + ' - ' + $("#FecFinal").val() + '</p>';
             item += GetFiltersReport();
             //if (Proveedor != "-Seleccione Cliente-") {
             //    item += '<p style="text-align: left; "><strong>Cliente</strong>: ' + Proveedor + '</p>';
@@ -188,7 +186,7 @@
             <div>
                 <div class="row">
                     <div class="col-sm-3">
-                        <select asp-for="filtro.Codigo" id="CodProv" class="form-control  mi-selector">
+                        <select asp-for="filtro.Codigo" id="CodCliente" class="form-control  mi-selector">
                             <option value="NULL" selected>-Seleccione Cliente-</option>
                             @foreach (var item in Model.Clientes)
                             {

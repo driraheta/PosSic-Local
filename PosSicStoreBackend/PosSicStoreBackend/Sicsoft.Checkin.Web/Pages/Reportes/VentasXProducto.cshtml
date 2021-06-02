@@ -63,6 +63,7 @@
         });
 
         function GetFiltersReport() {
+            var arregloObjetos = [];
             var linea = $("#CodLinea option:selected")
             var cajero = $("#CodCajero option:selected")
             var vendedor = $("#CodVend option:selected")
@@ -71,32 +72,15 @@
             var CodProInicial = $("#CodProInicial option:selected")
             var CodProFinal = $("#CodProFinal option:selected")
 
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (linea.val() !== "NULL") {
-                item += '<strong>Línea</strong>: ' + linea.text() + ' ';
-            }
-            if (cajero.val() !== "NULL") {
-                item += '<strong>Cajero</strong>: ' + cajero.text() + ' ';
-            }
-            if (vendedor.val() !== "NULL") {
-                item += '<strong>Vendedor</strong>: ' + vendedor.text() + ' ';
-            }
-            if (FechaIni.val() !== "NULL") {
-                item += '<strong>Fecha Inicio</strong>: ' + FechaIni.val() + ' ';
-            }
-            if (FechaFin.val() !== "NULL") {
-                item += '<strong>Fecha Fin</strong>: ' + FechaFin.val() + ' ';
-            }
-            if (CodProInicial.val() !== "NULL") {
-                item += '<strong>CodProInicial</strong>: ' + CodProInicial.text() + ' ';
-            }
-            if (CodProFinal.val() !== "NULL") {
-                item += '<strong>CodProFinal</strong>: ' + CodProFinal.text() + ' ';
-            }
-            item += ' </p>';
+            arregloObjetos.push({Nombre: 'Linea', prop: linea});
+            arregloObjetos.push({ Nombre: 'Cajero', prop: cajero });
+            arregloObjetos.push({ Nombre: 'Vendedor', prop: vendedor });
+            arregloObjetos.push({ Nombre: 'Fecha Inicia', prop: FechaIni });
+            arregloObjetos.push({ Nombre: 'Fecha Fin', prop: FechaFin });
+            arregloObjetos.push({ Nombre: 'Producto Inicia', prop: CodProInicial });
+            arregloObjetos.push({ Nombre: 'Producto Fin', prop: CodProFinal });
 
-            return item;
+            return FiltrosParaReporte(arregloObjetos);
         }
 
         function reportePdf() {

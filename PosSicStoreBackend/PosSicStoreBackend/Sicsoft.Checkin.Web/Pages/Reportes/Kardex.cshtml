@@ -63,28 +63,17 @@
         });
 
         function GetFiltersReport() {
+            var arregloObjetos = [];
             var producto = $("#CodCaja option:selected")
             var movimiento = $("#CodMov option:selected")
             var inicial = $("#FecInicial")
             var final = $("#FecFinal")
 
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (producto.val() !== "NULL") {
-                item += '<strong>Producto</strong>: ' + producto.text() + ' ';
-            }
-            if (movimiento.val() !== "NULL") {
-                item += '<strong>Movimiento</strong>: ' + movimiento.text() + ' ';
-            }
-            if (inicial.val() !== "NULL") {
-                item += '<strong>Fecha Inicial</strong>: ' + inicial.val() + ' ';
-            }
-            if (final.val() !== "NULL") {
-                item += '<strong>Fecha Final</strong>: ' + final.val() + ' ';
-            }
-            item += ' </p>';
-
-            return item;
+            arregloObjetos.push({ Nombre: 'Producto', prop: producto });
+            arregloObjetos.push({ Nombre: 'Movimiento', prop: movimiento });
+            arregloObjetos.push({ Nombre: 'Fecha Inicial', prop: inicial });
+            arregloObjetos.push({ Nombre: 'Fecha Final', prop: final });
+            return FiltrosParaReporte(arregloObjetos);
         }
 
         function reportePdf() {

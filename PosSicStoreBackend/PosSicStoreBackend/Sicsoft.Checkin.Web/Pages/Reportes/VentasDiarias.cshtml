@@ -63,23 +63,15 @@
         });
 
         function GetFiltersReport() {
+            var arregloObjetos = [];
             var selectCaja = $("#CodCaja option:selected")
             var selectCajero = $("#CodCajero option:selected")
             var selectVendedor = $("#CodVend option:selected") 
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (selectCaja.val() !== "NULL") {
-                item += '<strong>Caja</strong>: ' + selectCaja.text() + ' ';
-            }
-            if (selectCajero.val() !== "NULL") {
-                item += '<strong>Cajero</strong>: ' + selectCajero.text() + ' ';
-            }
-            if (selectVendedor.val() !== "NULL") {
-                item += '<strong>Vendedor</strong>: ' + selectVendedor.text() + ' ';
-            }
-            item += ' </p>';
 
-            return item;
+            arregloObjetos.push({ Nombre: 'Caja', prop: selectCaja });
+            arregloObjetos.push({ Nombre: 'Cajero', prop: selectCajero });
+            arregloObjetos.push({ Nombre: 'Vendedor', prop: selectVendedor });
+            return FiltrosParaReporte(arregloObjetos);
         }
 
         function reportePdf() {

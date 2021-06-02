@@ -50,23 +50,15 @@
         });
 
         function GetFiltersReport() {
+            var arregloObjetos = [];
             var prove = $("#CodProv option:selected")
             var linea1 = $("#CodLineaIni option:selected")
             var linea2 = $("#CodLineaFinal option:selected")
-            var item = "";
-            item += '<p style="text-align: left; ">'
-            if (prove.val() !== "NULL") {
-                item += '<strong>Proveedor</strong>: ' + prove.text() + ' ';
-            }
-            if (linea1.val() !== "NULL") {
-                item += '<strong>Línea Inicial</strong>: ' + linea1.text() + ' ';
-            }
-            if (linea2.val() !== "NULL") {
-                item += '<strong>Línea Final</strong>: ' + linea2.text() + ' ';
-            }
-            item += ' </p>';
 
-            return item;
+            arregloObjetos.push({ Nombre: 'Proveedor', prop: prove });
+            arregloObjetos.push({ Nombre: 'Linea inicio', prop: linea1 });
+            arregloObjetos.push({ Nombre: 'Linea fin', prop: linea2 });
+            return FiltrosParaReporte(arregloObjetos);
         }
 
         function reportePdf() {

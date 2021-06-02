@@ -62,18 +62,27 @@
 
         });
 
+        function GetFiltersReport() {
+            var arregloObjetos = [];
+            var busqueda = $("#FecInicial")
+
+            arregloObjetos.push({ Nombre: 'Fecha de Cierre:', prop: busqueda });
+            return FiltrosParaReporte(arregloObjetos);
+        }
+
         function reportePdf() {
             var checkbox1 = document.getElementById("cierreTarjetas");
 
             var combo = document.getElementById("CodVend");
 
             var item = "";
-            item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
+            item += '<p style="text-align: left; "><strong>Fecha Generaion:</strong>: ' + new Date().toLocaleDateString() + '</p>';
             item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
             item += '<h3 style="text-align: center;">' + localStorage.getItem("ubicacion") + '</h3>';
             item += '<p style="text-align: center;font-size: 15px;"><b>Reporte de Ventas Diarias</b></p>';
             item += '<br>';
-
+            //este reporte ya incluye esos datos en el encabezado.
+            //item += GetFiltersReport();
 
             if (checkbox1.checked) {
                 item += $("#Detallado").html();
@@ -121,8 +130,9 @@
             var table = $("#noDetallado");
             var html = table.html();
             var htmls = "";
+            var headerFilters = GetFiltersReport();
             var uri = 'data:application/vnd.ms-Excel;base64,';
-            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><table>{table}</table></body></html>';
+            var template = '<html xmlns:o="urn:schemas-Microsoft-com:office:office" xmlns:x="urn:schemas-Microsoft-com:office:Excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><head> <meta charset="utf-8" /></head><body><header>{filters}</header><table>{table}</table></body></html>';
             var base64 = function (s) {
                 return window.btoa(unescape(encodeURIComponent(s)))
             };
@@ -137,6 +147,7 @@
 
             var ctx = {
                 worksheet: 'reporte',
+                filters: headerFilters,
                 table: htmls
             }
 
