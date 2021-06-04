@@ -45,7 +45,24 @@
     <script src="~/lib/iCheck/icheck.js"></script>
     <script src="~/js/plugins/dataTables/datatables.min.js"></script>
     <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <style type="text/css">
+        table {
+            -fs-table-paginate: paginate;
+        }
 
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto
+        }
+
+        thead {
+            display: table-header-group
+        }
+
+        tfoot {
+            display: table-footer-group
+        }        
+    </style>
     <script>
         $(document).ready(function () {
             jQuery(document).ready(function ($) {
@@ -58,9 +75,19 @@
                 height: 'resolve'
             });
 
+            //$('#principal').DataTable({
+            //    pageLength: 15,
+            //    responsive: true,
+            //    order: [[4, "desc"], [0, "asc"], [1, "asc"]],
+            //    "ordering": false
+            //});
+
             checkDetallado();
 
+
         });
+
+        
 
         function GetFiltersReport() {
             var arregloObjetos = [];
@@ -74,7 +101,7 @@
             return FiltrosParaReporte(arregloObjetos);
         }
 
-        function reportePdf() {
+        function reportePdf() {            
             var checkbox1 = document.getElementById("divDetallado");
 
             var combo = document.getElementById("CodVend");
@@ -118,13 +145,14 @@
             } else {
 
                 item += $(".table-responsive").html();
+                //item += $(".dataTables-example").html();
 
                 var opt = {
                     margin: [10, 3, 15, 3],
                     pagebreak: { avoid: 'tr' },
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
-                    jsPDF: { format: 'letter', orientation: 'portrait' }
+                    jsPDF: { format: 'letter', orientation: 'portrait' }                    
                 };
 
                 console.log(opt);
@@ -314,7 +342,7 @@
     <div class="ibox-content lista">
         <div id="noDetallado">
             <div class="table-responsive" style="padding:inherit;">
-                <table class="table   dataTables-example" style="width: 100%; ">
+                <table id="principal" class="table   dataTables-example" style="width: 100%; ">
                     <thead>
                         <tr>
 
@@ -365,9 +393,13 @@
                         </tr>
 
                         }
+
+
                         @if (Model.CheckAnuladas)
                         {
+                            
                             <tr>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -384,6 +416,7 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
+                                <td></td>
                                 <td align="center" style="">
                                     <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
                                 </td>
@@ -393,10 +426,13 @@
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
                             </tr>
+                            
                         }
                         else
                         {
+                            
                             <tr>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -413,6 +449,7 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
+                                <td></td>
                                 <td align="center" style="">
                                     <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
                                 </td>
@@ -422,6 +459,7 @@
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
                             </tr>
+                            
                         }
 
                     </tbody>

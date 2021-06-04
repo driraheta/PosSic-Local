@@ -201,71 +201,136 @@
 
 
     <div class="ibox-content lista">
- 
- 
+
+
         <br />
-        <div class="table-responsive" style="padding:inherit;">
-            <table class="table table-striped dataTables-example" style="width: 100%;">
-                <thead>
-                    <tr>
+        @{
+            var general = Model.Producto.ToList();
+        }
+        @foreach (var item in Model.Producto.GroupBy(a => a.CodLinea).ToList())
+        {
+            @if (Model.Lineas.Where(d => d.CodLinea == item.Key).FirstOrDefault() != null)
+            {
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label style="font-weight: bold;">Línea Inventario:</label>
+                    </div>
+                    <div class="col-sm-6" style="text-align: left;">
+                        <p> @Model.Lineas.Where(d => d.CodLinea == item.Key).FirstOrDefault().NomLinea </p>
+                    </div>
+                </div>
 
-                        <td align="center" style="width: 10%;"><h3>Código</h3></td>
-                        <td align="center" style="width: 30%;"><h3>Nombre </h3></td>
-                        <td align="center" style="width: 20%;"><h3>Proveedor</h3></td>
-                        <td align="center" style="width: 10%;"><h3>Existencia</h3></td>
-                        <td align="center" style="width: 10%;"><h3>Precio</h3></td>
-                        <td align="center" style="width: 10%;"><h3>Total</h3></td>
-
-
-                    </tr>
-
-                </thead>
-                <tbody>
-
-                    @foreach (var item in Model.Producto.ToList())
-                    {
-                    <tr>
-
-                        <td align="center" style=" ">
-                            <p style="font-size:15px; font-weight: bold;"> @item.CodPro</p>
-                        </td>
-                        @*<td align="center" style="padding-top:15px;"><h3> @item.NombreTipoHab</h3></td>*@
-                        <td align="left" style=""><p style="font-size:15px;">  @item.NomPro </p></td>
-                        <td align="center" style="">
-                            @if (Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault() != null)
+                <div class="table-responsive" style="padding:inherit;">
+                    <table class="table table-striped dataTables-example" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <td align="center" style="width: 10%;"><h3>Código</h3></td>
+                                <td align="center" style="width: 30%;"><h3>Nombre </h3></td>
+                                <td align="center" style="width: 20%;"><h3>Proveedor</h3></td>
+                                <td align="center" style="width: 10%;"><h3>Existencia</h3></td>
+                                <td align="center" style="width: 10%;"><h3>Precio</h3></td>
+                                <td align="center" style="width: 10%;"><h3>Total</h3></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in item)
                             {
-                                <p style="font-size:15px;"> @Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault().NomProveedor</p>
+                                <tr>
+                                    <td align="center">
+                                        <p style="font-size:15px; font-weight: bold;"> @producto.CodPro</p>
+                                    </td>
+                                    <td align="left">
+                                        <p style="font-size:15px; font-weight: bold;"> @producto.NomPro</p>
+                                    </td>
+                                    <td align="center">
+                                        @if (Model.Proveedores.Where(a => a.CodProveedor == producto.CodPro).FirstOrDefault() != null)
+                                        {
+                                            <p style="font-size:15px; font-weight: bold;"> @Model.Proveedores.Where(a => a.CodProveedor == producto.CodPro).FirstOrDefault().NomProveedor</p>
+                                        }
+                                        else
+                                        {
+                                            <p style="font-size:15px; font-weight: bold;"> </p>
+                                        }
 
+                                    </td>
+                                    <td align="center" style="">
+                                        <p style="font-size:15px;"> @producto.Existencia</p>
+                                    </td>
+                                    <td align="right" style="">
+                                        <p style="font-size:15px;"> @decimal.Round(producto.PrecioVenta.Value, 2).ToString("N", formato)</p>
+                                    </td>
+                                    <td align="right" style="">
+                                        <p style="font-size:15px;"> @decimal.Round(producto.PrecioVenta.Value * producto.Existencia.Value, 2).ToString("N", formato)</p>
+                                    </td>
+                                </tr>
                             }
-                        </td>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+        @*<div class="table-responsive" style="padding:inherit;">
+                <table class="table table-striped dataTables-example" style="width: 100%;">
+                    <thead>
+                        <tr>
 
-                        <td align="center" style="">
-                            <p style="font-size:15px;"> @item.Existencia</p>
-                        </td>
-                        <td align="right" style="">
-                            <p style="font-size:15px;"> @decimal.Round(item.PrecioVenta.Value, 2).ToString("N", formato)</p>
-                        </td>
-                        <td align="right" style="">
-                            <p style="font-size:15px;"> @decimal.Round(item.PrecioVenta.Value * item.Existencia.Value, 2).ToString("N", formato)</p>
-                        </td>
+                            <td align="center" style="width: 10%;"><h3>Código</h3></td>
+                            <td align="center" style="width: 30%;"><h3>Nombre </h3></td>
+                            <td align="center" style="width: 20%;"><h3>Proveedor</h3></td>
+                            <td align="center" style="width: 10%;"><h3>Existencia</h3></td>
+                            <td align="center" style="width: 10%;"><h3>Precio</h3></td>
+                            <td align="center" style="width: 10%;"><h3>Total</h3></td>
 
+
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model.Producto.ToList())
+                        {
+                        <tr>
+
+                            <td align="center" style=" ">
+                                <p style="font-size:15px; font-weight: bold;"> @item.CodPro</p>
+                            </td>
+
+                            <td align="left" style=""><p style="font-size:15px;">  @item.NomPro </p></td>
+                            <td align="center" style="">
+                                @if (Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault() != null)
+                                {
+                                    <p style="font-size:15px;"> @Model.Proveedores.Where(a => a.CodProveedor == item.CodProveedor).FirstOrDefault().NomProveedor</p>
+
+                                }
+                            </td>
+
+                            <td align="center" style="">
+                                <p style="font-size:15px;"> @item.Existencia</p>
+                            </td>
+                            <td align="right" style="">
+                                <p style="font-size:15px;"> @decimal.Round(item.PrecioVenta.Value, 2).ToString("N", formato)</p>
+                            </td>
+                            <td align="right" style="">
+                                <p style="font-size:15px;"> @decimal.Round(item.PrecioVenta.Value * item.Existencia.Value, 2).ToString("N", formato)</p>
+                            </td>
+
+                        </tr>
+
+                        }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td align="center" style="padding-top: 15px;">
+                            <p style="font-size: 15px; font-weight: 600;">Total Productos</p>
+                        </td>
+                        <td align="center" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @Model.Producto.Sum(a => a.Existencia) </p></td>
+                        <td align="right" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @decimal.Round(Model.Producto.Sum(a => a.PrecioVenta).Value, 2).ToString("N", formato) </p></td>
+                        <td align="right" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @decimal.Round(Model.Producto.Sum(a => a.PrecioVenta * a.Existencia).Value, 2).ToString("N", formato) </p></td>
                     </tr>
+                    </tbody>
+                </table>
 
-                    }
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td align="center" style="padding-top: 15px;">
-                        <p style="font-size: 15px; font-weight: 600;">Total Productos</p>
-                    </td>
-                    <td align="center" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @Model.Producto.Sum(a => a.Existencia) </p></td>
-                    <td align="right" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @decimal.Round(Model.Producto.Sum(a => a.PrecioVenta).Value, 2).ToString("N", formato) </p></td>
-                    <td align="right" style="padding-top:15px; width: 180px;"><p style="font-size:15px;">  @decimal.Round(Model.Producto.Sum(a => a.PrecioVenta * a.Existencia).Value, 2).ToString("N", formato) </p></td>
-                </tr>
-                </tbody>
-            </table>
-
-        </div>
+            </div>*@
 
     </div>
 </div>

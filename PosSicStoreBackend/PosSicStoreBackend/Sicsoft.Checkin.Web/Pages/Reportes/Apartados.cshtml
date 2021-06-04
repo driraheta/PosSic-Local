@@ -417,7 +417,7 @@
                             <th align="center" style="height: 18px; text-align: center;">Nombre</th>
                             <th align="center" style="height: 18px; text-align: center;">Unidades</th>
                             <th align="center" style="height: 18px; text-align: center;">Precio</th>
-                            <th align="center" style="height: 18px; text-align: center;">Abonos</th>
+                            <th align="center" style="height: 18px; text-align: center;">Monto Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -437,7 +437,7 @@
                                 }
                                 <td style="width: 20%; text-align: center; height: 18px;">@decimal.Round(det.Cantidad, 2).ToString("N", formato)</td>
                                 <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
-                                <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
+                                <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round((det.Cantidad * det.PrecioVenta), 2).ToString("N", formato)</td>
                             </tr>
                         }
                     </tbody>

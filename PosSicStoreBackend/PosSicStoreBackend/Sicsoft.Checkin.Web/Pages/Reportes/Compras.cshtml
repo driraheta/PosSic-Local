@@ -303,7 +303,7 @@
                                 <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item.CostoPro, 2).ToString("N", formato) </p></td>
                                 <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.MontoDescuento ?? 0), 2).ToString("N", formato) </p></td>
                                 <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.MontoImpuesto ?? 0), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.CostoPro * item.Cantidad) - ((item.MontoDescuento ?? 0) + (item.MontoImpuesto ?? 0)), 2).ToString("N", formato) </p></td>
+                                <td align="right" style=""><p style="font-size:12px;">  @decimal.Round((item.CostoPro * item.Cantidad) - ((item.MontoDescuento ?? 0)) + (item.MontoImpuesto ?? 0), 2).ToString("N", formato) </p></td>
 
 
 
@@ -321,7 +321,7 @@
                         <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => a.CostoPro), 2).ToString("N", formato) </p></td>
                         <td align="right" style=""><p style="font-size:12px;"> @decimal.Round(item2.DetCompras.Sum(a => (a.MontoDescuento??0)), 2).ToString("N", formato) </p></td>
                         <td align="right" style=""><p style="font-size:12px;"> @decimal.Round(item2.DetCompras.Sum(a => (a.MontoImpuesto ?? 0)), 2).ToString("N", formato) </p></td>
-                        <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => (a.CostoPro * a.Cantidad) - ((a.MontoDescuento ?? 0) + (a.MontoImpuesto ?? 0))), 2).ToString("N", formato) </p></td>
+                        <td align="right" style=""><p style="font-size:12px;">  @decimal.Round(item2.DetCompras.Sum(a => (a.CostoPro * a.Cantidad) - (a.MontoDescuento ?? 0) + (a.MontoImpuesto ?? 0) ), 2).ToString("N", formato) </p></td>
 
 
 
@@ -349,13 +349,15 @@
                     <tr>
 
 
-                        <td align="left" style="width: 10%; ">
+                        <td align="left" style="width: 40%; ">
                             <p style="font-size:12px; font-weight: bold;">  </p>
                         </td>
-                        <td align="center" style="width: 40%; "><p style="font-size:12px; font-weight: bold;"> Total General:</p></td>
-                        <td align="center" style="width: 15%; "><p style="font-size:12px; "> @Convert.ToInt32(general.Sum(a => a.DetCompras.Sum(c => c.Cantidad))) </p></td>
-                        <td align="right" style="width: 15%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => c.CostoPro)), 2).ToString("N", formato) </p></td>
-                        <td align="right" style="width: 15%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => (c.CostoPro * c.Cantidad) - ((c.MontoDescuento ?? 0)+(c.MontoImpuesto ?? 0)))), 2).ToString("N", formato) </p></td>
+                        <td align="center" style="width: 10%; "><p style="font-size:12px; font-weight: bold;"> Total General:</p></td>
+                        <td align="center" style="width: 10%;"><p style="font-size:12px; "> @Convert.ToInt32(general.Sum(a => a.DetCompras.Sum(c => c.Cantidad))) </p></td>
+                        <td align="right" style="width: 10%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => c.CostoPro)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style="width: 10%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => c.MontoDescuento ?? 0)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style="width: 10%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => c.MontoImpuesto ?? 0)), 2).ToString("N", formato) </p></td>
+                        <td align="right" style="width: 10%;"><p style="font-size:12px;">  @decimal.Round(general.Sum(a => a.DetCompras.Sum(c => (c.CostoPro*c.Cantidad) - (c.MontoDescuento ?? 0) + (c.MontoImpuesto ?? 0))), 2).ToString("N", formato) </p></td>
 
 
 

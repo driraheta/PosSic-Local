@@ -230,8 +230,8 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <select asp-for="filtro.Texto" id="CodVend" class="form-control  mi-selector">
-                            <option value="NULL" selected>-Seleccione Vendedor-</option>
+                        <select asp-for="filtro.CodProveedor" id="CodVend" class="form-control  mi-selector">
+                            <option value="null" selected>-Seleccione Vendedor-</option>
                             @foreach (var item in Model.Vendedores)
                             {
                                 <option value="@item.CodVendedor">@item.CodVendedor - @item.NomVendedor</option>
