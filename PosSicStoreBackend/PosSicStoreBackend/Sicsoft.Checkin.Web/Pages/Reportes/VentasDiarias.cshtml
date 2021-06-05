@@ -41,28 +41,19 @@
     <script src="~/lib/summernote/summernote-bs4.min.js"></script>
     <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
     <link rel="stylesheet" href="~/lib/select2/css/select2-bootstrap4.min.css" />
+    <style>
+        .dt-buttons {
+            visibility: hidden;
+        }
+        .dataTables_paginate {
+            margin-right: 40% !important;
+        }
+    </style>
     <script src="~/lib/dropzone/dropzone.js"></script>
     <script src="~/lib/iCheck/icheck.js"></script>
     <script src="~/js/plugins/dataTables/datatables.min.js"></script>
     <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
-    <style type="text/css">
-        table {
-            -fs-table-paginate: paginate;
-        }
-
-        tr {
-            page-break-inside: avoid;
-            page-break-after: auto
-        }
-
-        thead {
-            display: table-header-group
-        }
-
-        tfoot {
-            display: table-footer-group
-        }        
-    </style>
+    
     <script>
         $(document).ready(function () {
             jQuery(document).ready(function ($) {
@@ -73,21 +64,47 @@
             $(".js-example-responsive").select2({
                 width: 'resolve',// need to override the changed default
                 height: 'resolve'
-            });
+            });            
 
-            //$('#principal').DataTable({
-            //    pageLength: 15,
-            //    responsive: true,
-            //    order: [[4, "desc"], [0, "asc"], [1, "asc"]],
-            //    "ordering": false
-            //});
-
-            checkDetallado();
-
-
+            checkDetallado();            
         });
 
-        
+
+        $(document).ready(function () {
+            $(".btnPDF").on('click', function () {
+                table.buttons('.buttons-pdf').trigger();
+            });
+
+            var table = $('#principal').DataTable({
+                pageLength: 10,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                dom: 'Bfrtip',                
+                buttons: [{
+                    extend: "pdfHtml5",
+                    filename: 'Reporte_de_Ventas_Diarias',
+                    title: localStorage.getItem("compañia") + '\n' + localStorage.getItem("ubicacion") + '\n' + 'Reporte de Ventas Diarias',
+                    messageTop: convertToPlain(GetFiltersReport()),
+                    pageSize: 'A4',
+                    customize: function (doc) {
+                    }
+                }]
+            });
+        })
+
+        function convertToPlain(html) {
+
+            // Create a new div element
+            var tempDivElement = document.createElement("div");
+
+            // Set the HTML content with the given value
+            tempDivElement.innerHTML = html;
+
+            // Retrieve the text property of the element 
+            return tempDivElement.textContent || tempDivElement.innerText || "";
+        }
 
         function GetFiltersReport() {
             var arregloObjetos = [];
@@ -398,7 +415,7 @@
                         @if (Model.CheckAnuladas)
                         {
                             
-                            <tr>
+                            @*<tr>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -411,8 +428,8 @@
                                 <td></td>
                                 <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.ImptoVentas), 2).ToString("N", formato) </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
-                            </tr>
-                            <tr>
+                            </tr>*@
+                            @*<tr>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -425,13 +442,13 @@
                                 <td align="right" style=""><p style="font-size:15px;">   </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                            </tr>
+                            </tr>*@
                             
                         }
                         else
                         {
                             
-                            <tr>
+                            @*<tr>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -444,8 +461,8 @@
                                 <td></td>
                                 <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.ImptoVentas), 2).ToString("N", formato) </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Total), 2).ToString("N", formato) </p></td>
-                            </tr>
-                            <tr>
+                            </tr>*@
+                            @*<tr>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -458,7 +475,7 @@
                                 <td align="right" style=""><p style="font-size:15px;">   </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
                                 <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                            </tr>
+                            </tr>*@
                             
                         }
 
