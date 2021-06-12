@@ -22,11 +22,16 @@
     <script src="~/js/plugins/dataTables/datatables.min.js"></script>
     <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
     <script>
+        var table = null;
         $(document).ready(function () {
 
-
-
-
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false
+            });  
         });
         function GetFiltersReport() {
             var arregloObjetos = [];
@@ -37,6 +42,16 @@
         }
 
         function reportePdf() {
+            table.destroy();
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": false,
+            }); 
+
             var item = "";
             item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
             item += '<h2 style="text-align: center;">' + localStorage.getItem("compañia") + '</h2>';
@@ -60,6 +75,16 @@
             html2pdf().set(opt)
                 .from(item)
                 .save("Reporte_de_Clientes.pdf");
+
+            table.destroy();
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": true,
+            }); 
 
         }
 

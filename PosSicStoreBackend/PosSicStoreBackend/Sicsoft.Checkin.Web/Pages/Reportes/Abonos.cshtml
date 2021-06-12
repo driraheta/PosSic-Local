@@ -38,17 +38,11 @@
     </style>
     <script src="~/lib/dropzone/dropzone.js"></script>
     <script src="~/lib/iCheck/icheck.js"></script>
-    @*<script src="~/js/plugins/dataTables/datatables.min.js"></script>
-        <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>*@
-    @*nuevo*@
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.25/b-1.7.1/b-html5-1.7.1/datatables.min.css" />
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.25/b-1.7.1/b-html5-1.7.1/datatables.min.js"></script>
-    @*FIN nuevo*@
+    <script src="~/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
 
     <script>
+        var table = null;
         $(document).ready(function () {
             jQuery(document).ready(function ($) {
                 $(document).ready(function () {
@@ -64,67 +58,14 @@
         });
 
         $(document).ready(function () {
-            var table = $('.dataTables-example').DataTable({
-                pageLength: 10,
+                table = $('.dataTables-example').DataTable({
+                pageLength: 30,
                 responsive: true,
                 searching: false,
-                info: false,
-                //order: [[4, "desc"], [0, "asc"], [1, "asc"]],
                 "ordering": false,
-                dom: 'Bfrtip',
-                pagingType: "simple_numbers",
-                //"sDom": '<"row view-filter"<"col-sm-12"<"pull-left"l><"pull-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>',
-                //buttons: [
-                //  'copy', 'csv', 'excel', 'pdf', 'print'
-                // ]
-                buttons: [{
-                    extend: "pdfHtml5",
-                    filename: 'Reporte_de_Abonos',
-                    title: localStorage.getItem("compañia") + '\n' + localStorage.getItem("ubicacion") + '\n' + 'Reporte de Abonos',
-                    messageTop: convertToPlain(GetFiltersReport()),    
-                    pageSize: 'A4',
-                    customize: function (doc) {
-                        
-                    }
-                    //customize: function (doc) {
-                    //    doc['footer'] = (function (page, pages) {
-                    //        return {
-                    //            columns: [{
-                    //                alignment: 'center',
-                    //                text: [{
-                    //                    text: page.toString(),
-                    //                    italics: true
-                    //                },
-                    //                    ' de ',
-                    //                {
-                    //                    text: pages.toString(),
-                    //                    italics: true
-                    //                }
-                    //                ]
-                    //            }],
-                    //            margin: [10, 0]
-                    //        }
-                    //    })
-                    //}
-                }]
-            });
-
-            $(".btnPDF").on('click', function () {
-                table.buttons('.buttons-pdf').trigger();
-            });
-        })
-
-        function convertToPlain(html) {
-
-            // Create a new div element
-            var tempDivElement = document.createElement("div");
-
-            // Set the HTML content with the given value
-            tempDivElement.innerHTML = html;
-
-            // Retrieve the text property of the element 
-            return tempDivElement.textContent || tempDivElement.innerText || "";
-        }
+                info: false                
+            });            
+        })        
 
         function GetFiltersReport() {
             var arregloObjetos = [];
@@ -138,7 +79,18 @@
             return FiltrosParaReporte(arregloObjetos);
         }
 
-        function reportePdf2() {
+        function reportePdf() {
+            table.destroy();
+
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": false,
+            });   
+
             var combo = document.getElementById("CodCliente");
             var Proveedor = combo.options[combo.selectedIndex].text;
             var item = "";
@@ -190,6 +142,16 @@
                     .save("Reporte_de_Abonos.pdf");
 
             }
+
+            table.destroy();
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": true,
+            }); 
         }
 
         function Excel() {
@@ -270,8 +232,8 @@
                     </div>
                     <div class="col-sm-3">
                         <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>&nbsp;
-                        @*<a onclick="javascript: reportePdf()" title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;*@
-                        <a title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        <a onclick="javascript: reportePdf()" title="Exportar a PDF" class="btn btn-primary btnPDF"> PDF</a> &nbsp;
+                        
                         <a onclick="javascript: Excel()" title="Exportar a Excel" class="btn btnExcel">EXCEL</a>
                     </div>
                     <div class="col-sm-12">

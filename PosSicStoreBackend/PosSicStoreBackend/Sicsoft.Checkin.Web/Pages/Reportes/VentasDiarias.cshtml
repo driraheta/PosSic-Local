@@ -55,6 +55,7 @@
     <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
     
     <script>
+        var table = null;
         $(document).ready(function () {
             jQuery(document).ready(function ($) {
                 $(document).ready(function () {
@@ -71,40 +72,15 @@
 
 
         $(document).ready(function () {
-            $(".btnPDF").on('click', function () {
-                table.buttons('.buttons-pdf').trigger();
-            });
-
-            var table = $('#principal').DataTable({
-                pageLength: 10,
+            table = $('#principal').DataTable({
+                pageLength: 30,
                 responsive: true,
                 searching: false,
                 "ordering": false,
                 info: false,
-                dom: 'Bfrtip',                
-                buttons: [{
-                    extend: "pdfHtml5",
-                    filename: 'Reporte_de_Ventas_Diarias',
-                    title: localStorage.getItem("compañia") + '\n' + localStorage.getItem("ubicacion") + '\n' + 'Reporte de Ventas Diarias',
-                    messageTop: convertToPlain(GetFiltersReport()),
-                    pageSize: 'A4',
-                    customize: function (doc) {
-                    }
-                }]
+                "paging": true,
             });
-        })
-
-        function convertToPlain(html) {
-
-            // Create a new div element
-            var tempDivElement = document.createElement("div");
-
-            // Set the HTML content with the given value
-            tempDivElement.innerHTML = html;
-
-            // Retrieve the text property of the element 
-            return tempDivElement.textContent || tempDivElement.innerText || "";
-        }
+        })        
 
         function GetFiltersReport() {
             var arregloObjetos = [];
@@ -118,7 +94,17 @@
             return FiltrosParaReporte(arregloObjetos);
         }
 
-        function reportePdf() {            
+        function reportePdf() {   
+            table.destroy();
+
+            table = $('#principal').DataTable({
+                "paging": false,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false
+            });
+                        
             var checkbox1 = document.getElementById("divDetallado");
 
             var combo = document.getElementById("CodVend");
@@ -179,6 +165,16 @@
                     .save("Reporte_de_Ventas_Diarias.pdf");
 
             }
+
+            table.destroy();
+            table = $('#principal').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": true,
+            });
         }
         function reporteDetallado() {
          

@@ -18,7 +18,7 @@
 @using Refit;
 @using Sicsoft.Checkin.Web.Models;
 @section Title{
-    <h2><i></i> @ViewData["Title"]</h2>
+    <h2> @ViewData["Title"] </h2>
 }
 
 @section breadcrumb{
@@ -181,8 +181,7 @@
 
 
 
-                    <div class="col-sm-4">
-                        @*<select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">*@
+                    <div class="col-sm-4">                        
                         <select asp-for="filtro.CodCaja" id="CodCaja" class="form-control  mi-selector">
                             <option value="NULL" selected>-Seleccione Caja-</option>
                             @foreach (var item in Model.Cajas)
@@ -192,8 +191,7 @@
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <select asp-for="filtro.CodProveedor" id="CodCajero" class="form-control  mi-selector">
-                            @*<select asp-for="filtro.CodBarras" id="CodCajero" class="form-control  mi-selector">*@
+                        <select asp-for="filtro.CodCajero" id="CodCajero" class="form-control  mi-selector">                            
                             <option value="NULL" selected>-Seleccione Cajero-</option>
                             @foreach (var item in Model.Cajeros)
                             {
@@ -202,8 +200,7 @@
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <select asp-for="filtro.CodVendedor" id="CodVend" class="form-control  mi-selector">
-                            @*<select asp-for="filtro.Texto" id="CodVend" class="form-control  mi-selector">*@
+                        <select asp-for="filtro.CodVendedor" id="CodVend" class="form-control  mi-selector">                          
                             <option value="NULL" selected>-Seleccione Vendedor-</option>
                             @foreach (var item in Model.Vendedores)
                             {

@@ -46,6 +46,7 @@
     <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
 
     <script>
+        var table = null;
         $(document).ready(function () {
             jQuery(document).ready(function ($) {
                 $(document).ready(function () {
@@ -58,6 +59,14 @@
             });
 
             checkDetallado();
+
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false
+            }); 
 
         });
 
@@ -74,6 +83,17 @@
         }        
 
         function reportePdf() {
+            table.destroy();
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": false,
+            }); 
+
+
             var checkbox1 = document.getElementById("divDetallado");
 
             var combo = document.getElementById("CodCliente");
@@ -123,7 +143,16 @@
                     .from(item)
                     .save("Reporte_de_Apartados.pdf");
             }
-        
+
+            table.destroy();
+            table = $('.dataTables-example').DataTable({
+                pageLength: 30,
+                responsive: true,
+                searching: false,
+                "ordering": false,
+                info: false,
+                "paging": true,
+            }); 
 
         }
  
