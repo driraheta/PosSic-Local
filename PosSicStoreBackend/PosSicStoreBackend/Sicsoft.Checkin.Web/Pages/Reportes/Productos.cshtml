@@ -216,7 +216,7 @@
                         <label style="font-weight: bold;">Línea Inventario:</label>
                     </div>
                     <div class="col-sm-6" style="text-align: left;">
-                        <p> @Model.Lineas.Where(d => d.CodLinea == item.Key).FirstOrDefault().NomLinea </p>
+                        <p> @item.Key - @Model.Lineas.Where(d => d.CodLinea == item.Key).FirstOrDefault().NomLinea </p>
                     </div>
                 </div>
 

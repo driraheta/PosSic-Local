@@ -45,6 +45,7 @@
         .dt-buttons {
             visibility: hidden;
         }
+
         .dataTables_paginate {
             margin-right: 40% !important;
         }
@@ -53,7 +54,7 @@
     <script src="~/lib/iCheck/icheck.js"></script>
     <script src="~/js/plugins/dataTables/datatables.min.js"></script>
     <script src="~/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
-    
+
     <script>
         var table = null;
         $(document).ready(function () {
@@ -65,9 +66,9 @@
             $(".js-example-responsive").select2({
                 width: 'resolve',// need to override the changed default
                 height: 'resolve'
-            });            
+            });
 
-            checkDetallado();            
+            checkDetallado();
         });
 
 
@@ -80,13 +81,13 @@
                 info: false,
                 "paging": true,
             });
-        })        
+        })
 
         function GetFiltersReport() {
             var arregloObjetos = [];
             var selectCaja = $("#CodCaja option:selected")
             var selectCajero = $("#CodCajero option:selected")
-            var selectVendedor = $("#CodVend option:selected") 
+            var selectVendedor = $("#CodVend option:selected")
 
             arregloObjetos.push({ Nombre: 'Caja', prop: selectCaja });
             arregloObjetos.push({ Nombre: 'Cajero', prop: selectCajero });
@@ -94,7 +95,7 @@
             return FiltrosParaReporte(arregloObjetos);
         }
 
-        function reportePdf() {   
+        function reportePdf() {
             table.destroy();
 
             table = $('#principal').DataTable({
@@ -104,11 +105,11 @@
                 "ordering": false,
                 info: false
             });
-                        
+
             var checkbox1 = document.getElementById("divDetallado");
 
             var combo = document.getElementById("CodVend");
-            var Proveedor = combo.options[combo.selectedIndex].text;                   
+            var Proveedor = combo.options[combo.selectedIndex].text;
 
             var item = "";
             item += '<p style="text-align: left; "><strong>Fecha</strong>: ' + new Date().toLocaleDateString() + '</p>';
@@ -127,14 +128,14 @@
             //}
 
             if (checkbox1.checked) {
-             
+
 
                 item += $("#Detallado").html();
 
                 var opt = {
                     margin: [10, 5, 15, 5],
                     pagebreak: { before: '.cuidado' },
-                    
+
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
                     jsPDF: { format: 'letter', orientation: 'portrait' }
@@ -155,7 +156,7 @@
                     pagebreak: { avoid: 'tr' },
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
-                    jsPDF: { format: 'letter', orientation: 'portrait' }                    
+                    jsPDF: { format: 'letter', orientation: 'portrait' }
                 };
 
                 console.log(opt);
@@ -177,7 +178,7 @@
             });
         }
         function reporteDetallado() {
-         
+
         }
         function Excel() {
             // $("#tlbIndexDash1").tableExport();
@@ -202,7 +203,7 @@
             var ctx = {
                 worksheet: 'reporte',
                 filters: headerFilters,
-                table: htmls                
+                table: htmls
             }
 
 
@@ -224,11 +225,11 @@
         }
 
         function checkAnuladas() {
-            
+
         }
     </script>
 }
-<link rel="stylesheet"  href="~/css/reportes.css"/>
+<link rel="stylesheet" href="~/css/reportes.css" />
 <style>
     h3 {
         font-weight: bold;
@@ -245,7 +246,8 @@
 
 
                     <div class="col-sm-4">
-                        <select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">
+                        @*<select asp-for="filtro.Codigo" id="CodCaja" class="form-control  mi-selector">*@
+                        <select asp-for="filtro.CodCaja" id="CodCaja" class="form-control  mi-selector">
                             <option value="NULL" selected>-Seleccione Caja-</option>
                             @foreach (var item in Model.Cajas)
                             {
@@ -254,7 +256,8 @@
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <select asp-for="filtro.CodBarras" id="CodCajero" class="form-control  mi-selector">
+                        <select asp-for="filtro.CodCajero" id="CodCaja" class="form-control  mi-selector">
+                            @*<select asp-for="filtro.CodBarras" id="CodCajero" class="form-control  mi-selector">*@
                             <option value="NULL" selected>-Seleccione Cajero-</option>
                             @foreach (var item in Model.Cajeros)
                             {
@@ -263,7 +266,8 @@
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <select asp-for="filtro.Texto" id="CodVend" class="form-control  mi-selector">
+                        <select asp-for="filtro.CodVendedor" id="CodCaja" class="form-control  mi-selector">
+                            @*<select asp-for="filtro.Texto" id="CodVend" class="form-control  mi-selector">*@
                             <option value="NULL" selected>-Seleccione Vendedor-</option>
                             @foreach (var item in Model.Vendedores)
                             {
@@ -324,7 +328,7 @@
                         </label>
 
                     </div>
-                   
+
 
                     <div class="col-sm-12">
                         <br />
@@ -377,102 +381,102 @@
 
                         @foreach (var item in Model.EncVtas)
                         {
-                        <tr>
+                            <tr>
 
-                            <td align="center" style=" ">
-                                <p style="font-size:15px; font-weight: bold;"> @item.NumFactura</p>
-                            </td>
-                            <td align="center" style=""><p style="font-size:12px;"> @item.FecFactura.Value.ToString("dd/MM/yyyy HH:mm")</p></td>
-                            <td align="center" style=""><p style="font-size:15px;"> @item.Cedula</p></td>
-                            @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
-                            {
-                                <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
-                            }
-                            else
-                            {
-                                <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
-                            }
-
-
-                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.SubTotal, 2).ToString("N", formato)) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.Descuento, 2).ToString("N", formato)) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Descuento > 0 && item.SubTotal > 0 ? ((item.Descuento / item.SubTotal) * 100) : 0), 2).ToString("N", formato)) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.ImptoVentas), 2).ToString("N", formato)) </p></td>
-                            <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Total), 2).ToString("N", formato)) </p></td>
-                            <td align="center" style=""><p style="font-size:12px;">@(item.Anulada ? (string.IsNullOrEmpty(item.NomSupervisor) ? "" : item.NomSupervisor) : "-") </p></td>
+                                <td align="center" style=" ">
+                                    <p style="font-size:15px; font-weight: bold;"> @item.NumFactura</p>
+                                </td>
+                                <td align="center" style=""><p style="font-size:12px;"> @item.FecFactura.Value.ToString("dd/MM/yyyy HH:mm")</p></td>
+                                <td align="center" style=""><p style="font-size:15px;"> @item.Cedula</p></td>
+                                @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
+                                {
+                                    <td align="left" style=""><p style="font-size:15px;"> @Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</p></td>
+                                }
+                                else
+                                {
+                                    <td align="left" style=""><p style="font-size:15px;"> &nbsp;</p></td>
+                                }
 
 
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.SubTotal, 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round(item.Descuento, 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Descuento > 0 && item.SubTotal > 0 ? ((item.Descuento / item.SubTotal) * 100) : 0), 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.ImptoVentas), 2).ToString("N", formato)) </p></td>
+                                <td align="right" style=""><p style="font-size:15px;"> @(item.Anulada && !Model.CheckAnuladas ? decimal.Round(0, 2).ToString("N", formato) : decimal.Round((item.Total), 2).ToString("N", formato)) </p></td>
+                                <td align="center" style=""><p style="font-size:12px;">@(item.Anulada ? (string.IsNullOrEmpty(item.NomSupervisor) ? "" : item.NomSupervisor) : "-") </p></td>
 
-                        </tr>
+
+
+                            </tr>
 
                         }
 
 
                         @if (Model.CheckAnuladas)
                         {
-                            
-                            @*<tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td align="center" style="">
-                                    <p style="font-size: 15px; font-weight: 600;">Total:</p>
-                                </td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.SubTotal), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Descuento), 2).ToString("N", formato) </p></td>
-                                <td></td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.ImptoVentas), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
-                            </tr>*@
-                            @*<tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td align="center" style="">
-                                    <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
-                                </td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Sum(a => a.SubTotal) - Model.EncVtas.Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">   </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                            </tr>*@
-                            
+
+                            <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td align="center" style="">
+                                        <p style="font-size: 15px; font-weight: 600;">Total:</p>
+                                    </td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.SubTotal), 2).ToString("N", formato) </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Descuento), 2).ToString("N", formato) </p></td>
+                                    <td></td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.ImptoVentas), 2).ToString("N", formato) </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Sum(a => a.Total), 2).ToString("N", formato) </p></td>
+                                </tr>
+                            <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td align="center" style="">
+                                        <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
+                                    </td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Sum(a => a.SubTotal) - Model.EncVtas.Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">   </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                </tr>
+
                         }
                         else
                         {
-                            
-                            @*<tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td align="center" style="">
-                                    <p style="font-size: 15px; font-weight: 600;">Total:</p>
-                                </td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.SubTotal), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Descuento), 2).ToString("N", formato) </p></td>
-                                <td></td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.ImptoVentas), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Total), 2).ToString("N", formato) </p></td>
-                            </tr>*@
-                            @*<tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td align="center" style="">
-                                    <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
-                                </td>
-                                <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Where(a => a.Anulada == false).Sum(a => a.SubTotal) - Model.EncVtas.Where(a => a.Anulada == false).Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">   </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                                <td align="right" style=""><p style="font-size:15px;">    </p></td>
-                            </tr>*@
-                            
+
+                            <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td align="center" style="">
+                                        <p style="font-size: 15px; font-weight: 600;">Total:</p>
+                                    </td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.SubTotal), 2).ToString("N", formato) </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Descuento), 2).ToString("N", formato) </p></td>
+                                    <td></td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.ImptoVentas), 2).ToString("N", formato) </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round(Model.EncVtas.Where(a => a.Anulada == false).Sum(d => d.Total), 2).ToString("N", formato) </p></td>
+                                </tr>
+                            <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td align="center" style="">
+                                        <p style="font-size: 15px; font-weight: 600;">Venta Neta:</p>
+                                    </td>
+                                    <td align="right" style=""><p style="font-size:15px;">  @decimal.Round((Model.EncVtas.Where(a => a.Anulada == false).Sum(a => a.SubTotal) - Model.EncVtas.Where(a => a.Anulada == false).Sum(a => a.Descuento)), 2).ToString("N", formato) </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">   </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                    <td align="right" style=""><p style="font-size:15px;">    </p></td>
+                                </tr>
+
                         }
 
                     </tbody>
@@ -488,167 +492,167 @@
             }
             @foreach (var item in Model.EncVtas)
             {
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group row">
-                        <div class="col-sm-3">
-                            <h3>No Factura</h3>
-
-                        </div>
-                        <div class="col-sm-6">
-                            <label style="margin-top: 10px;">@item.NumFactura</label>
-
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <div class="col-sm-3">
-                            <p><strong>Fecha:</strong></p> 
-
-                        </div>
-                        <div class="col-sm-6">
-                            <label>@item.FecFactura.Value.ToShortDateString()</label>
-
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <div class="col-sm-3">
-                            <p><strong>Caja:</strong></p>
-
-                        </div>
-                        <div class="col-sm-6">
-                            @if (Model.Cajas.Where(a => a.CodCaja == item.CodCaja).FirstOrDefault() != null)
-                                {
-                            <label>@Model.Cajas.Where(a => a.CodCaja == item.CodCaja).FirstOrDefault().NomCaja</label>
-
-
-                                }
-                                else
-                                {
-                            <label>No existe la caja</label>
-                                }
-
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group row">
+                <div class="row">
+                    <div class="col-sm-6">
                         <div class="form-group row">
-                            <div class="col-sm-6">
-                                <h2 hidden>Cajero</h2>
+                            <div class="col-sm-3">
+                                <h3>No Factura</h3>
 
                             </div>
                             <div class="col-sm-6">
+                                <label style="margin-top: 10px;">@item.NumFactura</label>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <p><strong>Fecha:</strong></p>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label>@item.FecFactura.Value.ToShortDateString()</label>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <p><strong>Caja:</strong></p>
+
+                            </div>
+                            <div class="col-sm-6">
+                                @if (Model.Cajas.Where(a => a.CodCaja == item.CodCaja).FirstOrDefault() != null)
+                                {
+                                    <label>@Model.Cajas.Where(a => a.CodCaja == item.CodCaja).FirstOrDefault().NomCaja</label>
+
+
+                                }
+                                else
+                                {
+                                    <label>No existe la caja</label>
+                                }
 
 
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row" style="margin-top: 35px;">
-                        <div class="col-sm-2">
-                            <p><strong>Cliente: </strong></p>
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+                            <div class="form-group row">
+                                <div class="col-sm-6">
+                                    <h2 hidden>Cajero</h2>
 
+                                </div>
+                                <div class="col-sm-6">
+
+
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-sm-4" style="text-align: left">
-                            @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
+                        <div class="form-group row" style="margin-top: 35px;">
+                            <div class="col-sm-2">
+                                <p><strong>Cliente: </strong></p>
+
+                            </div>
+                            <div class="col-sm-4" style="text-align: left">
+                                @if (Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault() != null)
                                 {
-                            <label>@Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</label>
+                                    <label>@Model.Clientes.Where(a => a.CodCliente == item.CodCliente).FirstOrDefault().NomCliente</label>
 
                                 }
                                 else
                                 {
-                            <label>No existe el cliente</label>
+                                    <label>No existe el cliente</label>
                                 }
 
 
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group row">
-                        <div class="col-sm-2">
-                            <p><strong>Vendedor: </strong></p>
+                        <div class="form-group row">
+                            <div class="col-sm-2">
+                                <p><strong>Vendedor: </strong></p>
 
-                        </div>
-                        <div class="col-sm-4" style="text-align: left">
-                            @if (Model.Vendedores.Where(a => a.CodVendedor == item.CodVendedor).FirstOrDefault() != null)
+                            </div>
+                            <div class="col-sm-4" style="text-align: left">
+                                @if (Model.Vendedores.Where(a => a.CodVendedor == item.CodVendedor).FirstOrDefault() != null)
                                 {
-                            <label>@Model.Vendedores.Where(a => a.CodVendedor == item.CodVendedor).FirstOrDefault().NomVendedor</label>
+                                    <label>@Model.Vendedores.Where(a => a.CodVendedor == item.CodVendedor).FirstOrDefault().NomVendedor</label>
 
                                 }
                                 else
                                 {
-                            <label>No existe el vendedor</label>
+                                    <label>No existe el vendedor</label>
                                 }
 
 
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
 
 
 
 
-            <table style="border: none; width: 100%; height: 36px;" border="1">
-                <thead>
-                    <tr style="height: 18px;">
-                        <th align="center" style="height: 18px; text-align: center;">Cod Prod</th>
-                        <th align="center" style="height: 18px; text-align: center;">Nom Prod</th>
-                        <th align="center" style="height: 18px; text-align: center;">Unidades</th>
-                        <th align="center" style="height: 18px; text-align: center;">Precio</th>
-                        <th align="center" style="height: 18px; text-align: center;">Abonos</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var det in item.Detalle)
+                <table style="border: none; width: 100%; height: 36px;" border="1">
+                    <thead>
+                        <tr style="height: 18px;">
+                            <th align="center" style="height: 18px; text-align: center;">Cod Prod</th>
+                            <th align="center" style="height: 18px; text-align: center;">Nom Prod</th>
+                            <th align="center" style="height: 18px; text-align: center;">Unidades</th>
+                            <th align="center" style="height: 18px; text-align: center;">Precio</th>
+                            <th align="center" style="height: 18px; text-align: center;">Abonos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var det in item.Detalle)
                         {
 
-                    <tr style="height: 18px; border: none; border-color: #fff;">
-                        <td style="width: 20%; height: 18px; text-align: center;">@det.CodPro</td>
-                        @if (Model.Productos.Where(a => a.CodPro == det.CodPro).FirstOrDefault() != null)
+                            <tr style="height: 18px; border: none; border-color: #fff;">
+                                <td style="width: 20%; height: 18px; text-align: center;">@det.CodPro</td>
+                                @if (Model.Productos.Where(a => a.CodPro == det.CodPro).FirstOrDefault() != null)
                                 {
-                        <td style="width: 20%; height: 18px;">@Model.Productos.Where(a => a.CodPro == det.CodPro).FirstOrDefault().NomPro</td>
+                                    <td style="width: 20%; height: 18px;">@Model.Productos.Where(a => a.CodPro == det.CodPro).FirstOrDefault().NomPro</td>
 
                                 }
                                 else
                                 {
-                        <td style="width: 20%; height: 18px;"></td>
+                                    <td style="width: 20%; height: 18px;"></td>
                                 }
-                        <td style="width: 20%; text-align: center; height: 18px;">@decimal.Round(det.Cantidad, 2).ToString("N", formato)</td>
-                        <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
-                        <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
-                    </tr>
+                                <td style="width: 20%; text-align: center; height: 18px;">@decimal.Round(det.Cantidad, 2).ToString("N", formato)</td>
+                                <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
+                                <td style="width: 20%; text-align: right; height: 18px;">@decimal.Round(det.PrecioVenta, 2).ToString("N", formato)</td>
+                            </tr>
                         }
-                </tbody>
-            </table>
-            <p>&nbsp;</p>
-            <table style="height: 54px; width: 53.3203%; border-collapse: collapse; border-color: #ffffff; margin-left: auto; margin-right: auto;" border="0">
-                <thead>
-                    <tr style="height: 18px;">
-                        <th align="center" style=" text-align: center; height: 18px;">SubTotal</th>
-                        <th align="center" style=" text-align: center; height: 18px;">Descuento</th>
-                        <th align="center" style=" text-align: center; height: 18px;">Impuestos</th>
-                        <th align="center" style=" text-align: center; height: 18px;">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="height: 36px;">
-                        <td style=" height: 36px; text-align: right;">@decimal.Round(item.SubTotal, 2).ToString("N", formato)</td>
-                        <td style=" height: 36px; text-align: right;">@decimal.Round(item.Descuento, 2).ToString("N", formato)</td>
-                        <td style=" height: 36px; text-align: right;">@decimal.Round(item.ImptoVentas, 2).ToString("N", formato)</td>
-                        <td style=" height: 36px; text-align: right;">@decimal.Round(item.Total, 2).ToString("N", formato)</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>&nbsp;</p>
-            <hr style="border-color: black;" />
+                    </tbody>
+                </table>
+                <p>&nbsp;</p>
+                <table style="height: 54px; width: 53.3203%; border-collapse: collapse; border-color: #ffffff; margin-left: auto; margin-right: auto;" border="0">
+                    <thead>
+                        <tr style="height: 18px;">
+                            <th align="center" style=" text-align: center; height: 18px;">SubTotal</th>
+                            <th align="center" style=" text-align: center; height: 18px;">Descuento</th>
+                            <th align="center" style=" text-align: center; height: 18px;">Impuestos</th>
+                            <th align="center" style=" text-align: center; height: 18px;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="height: 36px;">
+                            <td style=" height: 36px; text-align: right;">@decimal.Round(item.SubTotal, 2).ToString("N", formato)</td>
+                            <td style=" height: 36px; text-align: right;">@decimal.Round(item.Descuento, 2).ToString("N", formato)</td>
+                            <td style=" height: 36px; text-align: right;">@decimal.Round(item.ImptoVentas, 2).ToString("N", formato)</td>
+                            <td style=" height: 36px; text-align: right;">@decimal.Round(item.Total, 2).ToString("N", formato)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>&nbsp;</p>
+                <hr style="border-color: black;" />
                 if (i % 2 == 0)
                 {
-            <div class="cuidado"></div>
-            <div class="html2pdf__page-break"></div>
+                    <div class="cuidado"></div>
+                    <div class="html2pdf__page-break"></div>
                 }
 
 

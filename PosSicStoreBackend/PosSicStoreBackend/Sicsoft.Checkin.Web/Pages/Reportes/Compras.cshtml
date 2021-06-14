@@ -192,7 +192,7 @@
                         <div class="form-group row">
                             <div class="col-sm-12">
                                 <select asp-for="filtro.CodProveedor" id="CodProv" class="form-control  mi-selector">
-                                    <option value="00" selected>-Seleccione Proveedor-</option>
+                                    <option value="NULL" selected>-Seleccione Proveedor-</option>
                                     @foreach (var item in Model.Proveedores)
                                     {
                                         <option value="@item.CodProveedor">@item.CodProveedor - @item.NomProveedor</option>
